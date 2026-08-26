@@ -1,13 +1,14 @@
-# Koala V1.6.3 — iPhone stable
+# Koala V1.6.4 — Koalas intégrés
 
-Correctifs :
-- choix du mois remplacé par un vrai menu déroulant Safari/iPhone
-- 24 derniers mois disponibles
-- bouton Enregistrer des revenus indépendant du submit fragile des dialogs
-- boutons d'enregistrement explicites pour dépenses, fixes, catégories, épargne et objectifs
-- nombres avec virgule acceptés pour les revenus
-- mascottes utilisent les icônes Koala déjà présentes dans le dépôt
-- cache forcé V1.6.3
-- JavaScript vérifié par Node
+Cette version intègre les illustrations Koala directement dans index.html sous forme de SVG.
+Elles ne dépendent donc plus de fichiers image externes ou du cache Safari.
 
-Les données existantes restent dans le même stockage local.
+Les correctifs précédents restent inclus :
+- mois
+- revenus
+- dépenses
+- fixes
+- catégories
+- épargne
+- objectifs
+- historique
