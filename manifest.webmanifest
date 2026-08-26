@@ -1,11 +1,11 @@
 {
   "name": "Koala",
   "short_name": "Koala",
-  "description": "Koala — budget, dépenses et objectifs d’épargne",
+  "description": "Koala — mon budget et mon épargne",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#fbf8f2",
-  "theme_color": "#155f43",
+  "background_color": "#f8f5ef",
+  "theme_color": "#1b6448",
   "lang": "fr",
   "icons": [
     {

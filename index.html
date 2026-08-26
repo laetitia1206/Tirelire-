@@ -13,122 +13,90 @@
   <title>Koala</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="koala-v1-5.css?v=150" />
+  <link rel="stylesheet" href="koala-v1-6.css?v=160" />
 </head>
 <body>
-  <div class="desktop-app">
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <img src="icons/koala-logo.png" alt="" class="brand-koala">
+  <div class="app-shell">
+    <header class="mobile-topbar">
+      <div class="mobile-brand">
+        <img src="icons/koala-avatar.png" alt="" />
         <div>
-          <div class="brand-name">Koala</div>
-          <p>Gère ton argent, atteins tes objectifs,<br>construis ton avenir.</p>
+          <strong>Koala</strong>
+          <small>Mon budget</small>
         </div>
       </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙</button>
+    </header>
 
-      <nav class="side-nav">
-        <button class="side-nav-item active" data-view="home"><span>⌂</span>Accueil</button>
-        <button class="side-nav-item" data-view="expenses"><span>▣</span>Dépenses</button>
-        <button class="side-nav-item" data-view="fixed"><span>⌂</span>Charges fixes</button>
-        <button class="side-nav-item" data-view="savings"><span>♡</span>Épargne & objectifs</button>
-        <button class="side-nav-item" data-view="analysis"><span>▥</span>Analyse</button>
-      </nav>
-
-      <div class="sidebar-spacer"></div>
-      <div class="sidebar-quote">
-        <img src="icons/koala-recap.png" alt="">
-        <strong>Citation du jour</strong>
-        <p>Chaque petit pas aujourd’hui construit ton avenir de demain.</p>
+    <section class="mobile-greeting">
+      <div>
+        <p>Bonjour 👋</p>
+        <strong>Voici ton mois en un coup d’œil</strong>
       </div>
-      <button class="side-settings" id="settingsBtnDesktop"><span>⚙</span>Paramètres</button>
-    </aside>
+      <img src="icons/koala-small.png" alt="" />
+    </section>
 
-    <div class="content-shell">
-      <header class="desktop-topbar">
-        <div>
-          <p class="desktop-greeting">Bonjour ! 👋</p>
-          <p class="desktop-subtitle">Voici ton résumé du mois.</p>
-        </div>
-        <div class="top-actions">
-          <section class="month-switcher" aria-label="Choisir le mois">
-            <button class="month-arrow" id="prevMonthBtn" aria-label="Mois précédent">‹</button>
-            <button class="month-current" id="monthPickerBtn">
-              <span id="selectedMonthLabel">Ce mois-ci</span>
-              <small>Historique</small>
-            </button>
-            <button class="month-arrow" id="nextMonthBtn" aria-label="Mois suivant">›</button>
-            <input id="monthPicker" type="month" class="month-picker-hidden">
-          </section>
-          <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙</button>
-        </div>
-      </header>
+    <section class="month-switcher" aria-label="Choisir le mois">
+      <button class="month-arrow" id="prevMonthBtn" aria-label="Mois précédent">‹</button>
+      <button class="month-current" id="monthPickerBtn">
+        <span id="selectedMonthLabel">Ce mois-ci</span>
+        <small>Historique</small>
+      </button>
+      <button class="month-arrow" id="nextMonthBtn" aria-label="Mois suivant">›</button>
+      <input id="monthPicker" type="month" class="month-picker-hidden" />
+    </section>
 
-      <div class="mobile-header">
-        <div class="mobile-brand"><img src="icons/koala-logo.png" alt=""><strong>Koala</strong></div>
-        <button class="icon-btn" id="settingsBtnMobile" aria-label="Réglages">⚙</button>
-      </div>
-
-      <main>
-
+    <main>
       <section class="view active" id="homeView">
-        <div class="home-web-grid">
-          <div class="home-left">
-            <div class="hero-card">
-              <div class="hero-copy">
-                <p class="muted">Reste à vivre</p>
+        <div class="hero-card"><img src="icons/koala-hero.png" class="hero-koala" alt="" />
+          <p class="muted">Reste à vivre</p>
           <div class="hero-value" id="remainingValue">0,00 €</div>
           <div class="daily-pill" id="dailyBudget">0,00 € / jour</div>
           <div class="progress-track"><div class="progress-fill" id="monthProgress"></div></div>
-              <div class="hero-foot">
-                <span id="spentSummary">0,00 € dépensés</span>
-                <span id="incomeSummary">0,00 € de revenus</span>
-              </div>
-            </div>
-            <img src="icons/koala-hero.png" class="hero-koala" alt="">
+          <div class="hero-foot">
+            <span id="spentSummary">0,00 € dépensés</span>
+            <span id="incomeSummary">0,00 € de revenus</span>
           </div>
+        </div>
 
-          <section class="month-recap-card" id="monthRecapCard">
+        <section class="month-recap-card" id="monthRecapCard">
           <div>
             <p class="eyebrow">BILAN DU MOIS</p>
             <h2 id="monthRecapTitle">Ce mois-ci</h2>
           </div>
-          <div class="recap-visual">
-            <img src="icons/koala-recap.png" alt="">
-            <div class="recap-main" id="monthRecapMain">0,00 € économisés</div>
-          </div>
+          <div class="recap-main" id="monthRecapMain">0,00 € économisés</div>
           <div class="recap-breakdown">
             <div><span>Épargne mise de côté</span><strong id="recapSavings">0,00 €</strong></div>
             <div><span>Reste non dépensé</span><strong id="recapUnspent">0,00 €</strong></div>
             <div><span>Comparaison mois précédent</span><strong id="recapComparison">—</strong></div>
             <div><span>Total économisé depuis le début</span><strong id="recapLifetime">0,00 €</strong></div>
           </div>
-          </section>
-        </div>
+        </section>
 
         <div class="stats-grid">
           <article class="stat-card">
-            <span class="stat-icon icon-green">▣</span>
+            <span class="stat-icon">💰</span>
             <div>
               <p>Revenus</p>
               <strong id="incomeValue">0,00 €</strong>
             </div>
           </article>
           <article class="stat-card">
-            <span class="stat-icon icon-orange">⌂</span>
+            <span class="stat-icon">🧾</span>
             <div>
               <p>Charges fixes</p>
               <strong id="fixedValue">0,00 €</strong>
             </div>
           </article>
           <article class="stat-card">
-            <span class="stat-icon icon-coral">▤</span>
+            <span class="stat-icon">💳</span>
             <div>
               <p>Dépenses</p>
               <strong id="expenseValue">0,00 €</strong>
             </div>
           </article>
           <article class="stat-card">
-            <span class="stat-icon icon-sage">♡</span>
+            <span class="stat-icon">💚</span>
             <div>
               <p>Épargne</p>
               <strong id="savingValue">0,00 €</strong>
@@ -136,11 +104,10 @@
           </article>
         </div>
 
-        <div class="analytics-grid">
         <section class="section-card">
           <div class="section-head">
             <div>
-              <p class="eyebrow">RÉPARTITION DES DÉPENSES</p>
+              <p class="eyebrow">RÉPARTITION</p>
               <h2>Ce mois-ci</h2>
             </div>
             <button class="text-btn" data-nav="analysis">Voir tout</button>
@@ -157,8 +124,7 @@
           </div>
           <div id="recentTransactions" class="transaction-list empty-state">Aucune opération pour le moment.</div>
         </section>
-              </div>
-</section>
+      </section>
 
       <section class="view" id="expensesView">
         <div class="section-head page-head">
@@ -255,20 +221,17 @@
 
         <div id="goalList" class="goal-list empty-state">Crée ton premier objectif d’épargne.</div>
       </section>
-    
+    </main>
 
     <button class="fab" id="fabAddExpense" aria-label="Ajouter une dépense">＋</button>
 
     <nav class="bottom-nav">
       <button class="nav-item active" data-view="home"><span>⌂</span><small>Accueil</small></button>
-      <button class="nav-item" data-view="expenses"><span>◫</span><small>Dépenses</small></button>
-      <button class="nav-item" data-view="fixed"><span>▤</span><small>Fixes</small></button>
-      <button class="nav-item" data-view="analysis"><span>◔</span><small>Analyse</small></button>
+      <button class="nav-item" data-view="expenses"><span>▣</span><small>Dépenses</small></button>
+      <div class="nav-spacer" aria-hidden="true"></div>
       <button class="nav-item" data-view="savings"><span>♡</span><small>Épargne</small></button>
+      <button class="nav-item" id="menuBtn"><span>☰</span><small>Menu</small></button>
     </nav>
-      </main>
-    </div>
-  </div>
   </div>
 
   <dialog id="expenseDialog" class="modal">
@@ -299,6 +262,22 @@
     </form>
   </dialog>
 
+
+
+  <dialog id="menuDialog" class="modal menu-modal">
+    <div class="modal-card menu-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">KOALA</p>
+          <h2>Menu</h2>
+        </div>
+        <button class="icon-btn dialog-close" type="button" data-dialog-close aria-label="Fermer">✕</button>
+      </div>
+      <button class="menu-link" data-menu-view="fixed"><span>⌂</span><div><strong>Charges fixes</strong><small>Abonnements, assurances, paiements</small></div></button>
+      <button class="menu-link" data-menu-view="analysis"><span>▥</span><div><strong>Analyse</strong><small>Répartition et historique</small></div></button>
+      <button class="menu-link" id="menuSettingsBtn"><span>⚙</span><div><strong>Réglages</strong><small>Revenus, paie, sauvegarde</small></div></button>
+    </div>
+  </dialog>
 
   <dialog id="fixedDialog" class="modal">
     <form method="dialog" id="fixedForm" class="modal-card">
@@ -436,6 +415,6 @@
     </form>
   </dialog>
 
-  <script src="koala-v1-5.js?v=150"></script>
+  <script src="koala-v1-6.js?v=160"></script>
 </body>
 </html>
