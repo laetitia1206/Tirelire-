@@ -84,6 +84,69 @@ function monthLabel(key){
   return label.charAt(0).toUpperCase()+label.slice(1);
 }
 function isCurrentSelectedMonth(){ return selectedMonth===monthKey(); }
+function monthDiff(fromKey,toKey){
+  const [fy,fm]=fromKey.split("-").map(Number);
+  const [ty,tm]=toKey.split("-").map(Number);
+  return (ty-fy)*12 + (tm-fm);
+}
+function installmentInfo(charge,key){
+  if(charge.category!=="paiement-plusieurs-fois" || !charge.installmentTotalAmount || !charge.installmentCount || !charge.installmentStartMonth){
+    return null;
+  }
+  const diff=monthDiff(charge.installmentStartMonth,key);
+  const count=Number(charge.installmentCount);
+  if(diff<0 || diff>=count) return null;
+  const total=Number(charge.installmentTotalAmount);
+  const base=Math.floor((total/count)*100)/100;
+  const installmentNumber=diff+1;
+  const amount=installmentNumber===count ? Math.round((total-base*(count-1))*100)/100 : base;
+  const paidBefore=Math.round((base*Math.max(0,installmentNumber-1))*100)/100;
+  const paidAfter=Math.min(total,Math.round((paidBefore+amount)*100)/100);
+  const remaining=Math.max(0,Math.round((total-paidAfter)*100)/100);
+  return {installmentNumber,count,amount,total,paidAfter,remaining};
+}
+function fixedChargesForMonth(key){
+  return state.fixedCharges.filter(x=>{
+    if(x.archived && x.category!=="paiement-plusieurs-fois") return false;
+    if(x.category==="paiement-plusieurs-fois") return !!installmentInfo(x,key);
+    return !x.archived;
+  });
+}
+function fixedTotalForMonth(key){
+  return fixedChargesForMonth(key).reduce((sum,x)=>{
+    if(x.category==="paiement-plusieurs-fois"){
+      const info=installmentInfo(x,key);
+      return sum+(info?info.amount:0);
+    }
+    return sum+Number(x.amount||0);
+  },0);
+}
+function savingsTotalForMonth(key){
+  return state.savings.filter(x=>monthKey(x.date)===key).reduce((s,x)=>s+Number(x.amount),0);
+}
+function expensesTotalForMonth(key){
+  return state.expenses.filter(x=>monthKey(x.date)===key).reduce((s,x)=>s+Number(x.amount),0);
+}
+function monthlyEconomy(key){
+  const t=totalsForMonth(key);
+  const unspent=Math.max(0,t.remaining);
+  return {saved:t.savings,unspent,total:t.savings+unspent};
+}
+function allKnownMonthKeys(){
+  const keys=new Set([
+    monthKey(),
+    ...Object.keys(state.monthlySnapshots||{}),
+    ...state.expenses.map(x=>monthKey(x.date)),
+    ...state.savings.map(x=>monthKey(x.date))
+  ]);
+  state.fixedCharges.forEach(x=>{
+    if(x.category==="paiement-plusieurs-fois" && x.installmentStartMonth && x.installmentCount){
+      for(let i=0;i<Number(x.installmentCount);i++) keys.add(shiftMonth(x.installmentStartMonth,i));
+    }
+  });
+  return [...keys].sort();
+}
+
 
 
 function saveState(){
@@ -130,19 +193,14 @@ function fixedCategoryInfo(id){
   return state.fixedCategories.find(c=>c.id===id) || {name:"Autres",emoji:"📦"};
 }
 function activeFixedCharges(){
-  return state.fixedCharges.filter(x=>!x.archived);
+  return fixedChargesForMonth(monthKey());
 }
 function fixedTotal(){
-  return activeFixedCharges().reduce((s,x)=>s+Number(x.amount||0),0);
+  return fixedTotalForMonth(monthKey());
 }
 function maybeArchiveFinishedInstallments(){
-  let changed=false;
-  state.fixedCharges.forEach(x=>{
-    if(x.category==="paiement-plusieurs-fois" && x.autoEnd && Number(x.installmentCount)>0 && Number(x.installmentCurrent)>=Number(x.installmentCount) && !x.archived){
-      x.archived=true; changed=true;
-    }
-  });
-  if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  // Les paiements fractionnés sont désormais actifs uniquement pendant
+  // le nombre de mois défini. Ils disparaissent automatiquement ensuite.
 }
 
 function currentMonthExpenses(){ return selectedMonthExpenses(); }
@@ -153,7 +211,7 @@ function ensureMonthSnapshot(key){
   if(!state.monthlySnapshots[key]){
     state.monthlySnapshots[key]={
       income:Number(state.settings.income)||0,
-      fixed:fixedTotal()
+      fixed:fixedTotalForMonth(key)
     };
   }
   return state.monthlySnapshots[key];
@@ -162,7 +220,7 @@ function syncCurrentMonthSnapshot(){
   if(!state.monthlySnapshots) state.monthlySnapshots={};
   state.monthlySnapshots[monthKey()]={
     income:Number(state.settings.income)||0,
-    fixed:fixedTotal()
+    fixed:fixedTotalForMonth(monthKey())
   };
 }
 
@@ -172,11 +230,11 @@ function totalsForMonth(key){
   let income, fixed;
   if(key===monthKey()){
     income=Number(state.settings.income)||0;
-    fixed=fixedTotal();
+    fixed=fixedTotalForMonth(key);
   }else{
-    const snap=state.monthlySnapshots?.[key] || {income:0,fixed:0};
-    income=Number(snap.income)||0;
-    fixed=Number(snap.fixed)||0;
+    const snap=state.monthlySnapshots?.[key];
+    income=snap ? Number(snap.income)||0 : Number(state.settings.income)||0;
+    fixed=snap ? Number(snap.fixed)||0 : fixedTotalForMonth(key);
   }
   return {income,fixed,expenses,savings,remaining:income-fixed-expenses-savings};
 }
@@ -189,6 +247,32 @@ function setMonthTitle(){
   document.getElementById("monthTitle").textContent = monthLabel(selectedMonth);
   document.getElementById("selectedMonthLabel").textContent = monthLabel(selectedMonth);
   document.getElementById("monthPicker").value = selectedMonth;
+}
+
+
+function renderMonthlyRecap(){
+  const eco=monthlyEconomy(selectedMonth);
+  const prevKey=shiftMonth(selectedMonth,-1);
+  const prevEco=monthlyEconomy(prevKey);
+  const comparison=eco.total-prevEco.total;
+  const lifetime=allKnownMonthKeys()
+    .filter(k=>k<=selectedMonth)
+    .reduce((sum,k)=>sum+monthlyEconomy(k).total,0);
+
+  document.getElementById("monthRecapTitle").textContent = monthLabel(selectedMonth);
+  document.getElementById("monthRecapMain").textContent = `${fmt(eco.total)} économisés`;
+  document.getElementById("recapSavings").textContent = fmt(eco.saved);
+  document.getElementById("recapUnspent").textContent = fmt(eco.unspent);
+
+  const cmp=document.getElementById("recapComparison");
+  if(prevEco.total===0 && !allKnownMonthKeys().includes(prevKey)){
+    cmp.textContent="Pas encore de comparaison";
+    cmp.className="";
+  }else{
+    cmp.textContent = comparison===0 ? "Identique" : `${comparison>0?"+ ":"- "}${fmt(Math.abs(comparison))}`;
+    cmp.className = comparison>=0 ? "positive" : "negative";
+  }
+  document.getElementById("recapLifetime").textContent = fmt(lifetime);
 }
 
 function renderHome(){
@@ -302,22 +386,43 @@ function renderFixedCategorySelects(){
 
 function fixedChargeHTML(x){
   const c=fixedCategoryInfo(x.category);
-  const installment=x.category==="paiement-plusieurs-fois" && x.installmentCount
-    ? `<span class="installment-note">Échéance ${Number(x.installmentCurrent)||1}/${Number(x.installmentCount)}</span>`
-    : "";
+  let installment="", progress="";
+  let displayAmount=Number(x.amount||0);
+
+  if(x.category==="paiement-plusieurs-fois"){
+    const info=installmentInfo(x,monthKey());
+    if(info){
+      displayAmount=info.amount;
+      installment=`<span class="installment-note">Mensualité ${info.installmentNumber}/${info.count}</span>`;
+      const pct=(info.paidAfter/info.total)*100;
+      progress=`<div class="payment-progress">
+        <div class="bar-wrap"><div class="bar" style="width:${pct}%"></div></div>
+        <div class="meta"><span>${fmt(info.paidAfter)} payés</span><span>${fmt(info.remaining)} restants</span></div>
+      </div>`;
+    }else{
+      const start=x.installmentStartMonth ? monthLabel(x.installmentStartMonth) : "—";
+      installment=`<span class="installment-note">Débute : ${start}</span>`;
+      displayAmount=x.installmentCount ? Number(x.installmentTotalAmount)/Number(x.installmentCount) : 0;
+    }
+  }
+
   const comment=x.comment?`<small class="comment-note">${escapeHtml(x.comment)}</small>`:"";
   return `<div class="transaction-row clickable" data-fixed-id="${x.id}">
     <div class="emoji">${c.emoji}</div>
-    <div class="row-main"><strong>${escapeHtml(x.label)}</strong><small>${c.name}</small>${installment}${comment}</div>
-    <div class="row-value">- ${fmt(x.amount)}</div>
+    <div class="row-main"><strong>${escapeHtml(x.label)}</strong><small>${c.name}</small>${installment}${comment}${progress}</div>
+    <div class="row-value">- ${fmt(displayAmount)}</div>
   </div>`;
 }
 
 function renderFixed(){
   renderFixedCategorySelects();
-  const total=fixedTotal();
-  const subs=activeFixedCharges().filter(x=>["medias","abonnements","telephone"].includes(x.category)).reduce((s,x)=>s+Number(x.amount),0);
-  const inst=activeFixedCharges().filter(x=>x.category==="paiement-plusieurs-fois").reduce((s,x)=>s+Number(x.amount),0);
+  const currentKey=monthKey();
+  const currentCharges=fixedChargesForMonth(currentKey);
+  const total=fixedTotalForMonth(currentKey);
+  const subs=currentCharges.filter(x=>["medias","abonnements","telephone"].includes(x.category)).reduce((s,x)=>s+Number(x.amount),0);
+  const inst=currentCharges.filter(x=>x.category==="paiement-plusieurs-fois").reduce((s,x)=>{
+    const info=installmentInfo(x,currentKey); return s+(info?info.amount:0);
+  },0);
   document.getElementById("fixedMonthlyTotal").textContent=fmt(total);
   document.getElementById("fixedSubscriptionsTotal").textContent=fmt(subs);
   document.getElementById("installmentsTotal").textContent=fmt(inst);
@@ -326,7 +431,7 @@ function renderFixed(){
 function filterFixedList(){
   const q=(document.getElementById("searchFixed").value||"").toLowerCase();
   const cat=document.getElementById("filterFixedCategory").value;
-  const list=activeFixedCharges()
+  const list=state.fixedCharges.filter(x=>!x.archived || x.category==="paiement-plusieurs-fois")
     .filter(x=>(!cat||x.category===cat) && (!q||(x.label||"").toLowerCase().includes(q)||(x.comment||"").toLowerCase().includes(q)||fixedCategoryInfo(x.category).name.toLowerCase().includes(q)))
     .sort((a,b)=>fixedCategoryInfo(a.category).name.localeCompare(fixedCategoryInfo(b.category).name)||a.label.localeCompare(b.label));
   const el=document.getElementById("fixedList");
@@ -423,7 +528,7 @@ function renderSettings(){
   document.getElementById("payDay").value=state.settings.payDay||1;
 }
 function renderAll(){
-  maybeArchiveFinishedInstallments(); setMonthTitle(); renderCategorySelects(); renderHome(); renderExpenses(); renderFixed(); renderAnalysis(); renderSavings(); renderSettings();
+  maybeArchiveFinishedInstallments(); ensureMonthSnapshot(selectedMonth); setMonthTitle(); renderCategorySelects(); renderHome(); renderMonthlyRecap(); renderExpenses(); renderFixed(); renderAnalysis(); renderSavings(); renderSettings();
 }
 
 function navigate(view){
@@ -481,6 +586,7 @@ function openFixed(id=null){
   document.getElementById("fixedDialogTitle").textContent="Ajouter une charge";
   document.getElementById("deleteFixedBtn").classList.add("hidden");
   renderFixedCategorySelects();
+  document.getElementById("installmentStartMonth").value=monthKey();
   if(id){
     const x=state.fixedCharges.find(e=>e.id===id); if(!x)return;
     document.getElementById("fixedId").value=x.id;
@@ -488,10 +594,9 @@ function openFixed(id=null){
     document.getElementById("fixedCategory").value=x.category;
     document.getElementById("fixedAmount").value=x.amount;
     document.getElementById("fixedComment").value=x.comment||"";
+    document.getElementById("installmentTotalAmount").value=x.installmentTotalAmount||"";
     document.getElementById("installmentCount").value=x.installmentCount||"";
-    document.getElementById("installmentCurrent").value=x.installmentCurrent||"";
-    document.getElementById("installmentNextDate").value=x.installmentNextDate||"";
-    document.getElementById("installmentAutoEnd").checked=x.autoEnd!==false;
+    document.getElementById("installmentStartMonth").value=x.installmentStartMonth||monthKey();
     document.getElementById("fixedDialogTitle").textContent="Modifier la charge";
     document.getElementById("deleteFixedBtn").classList.remove("hidden");
   }
@@ -500,6 +605,25 @@ function openFixed(id=null){
 }
 document.getElementById("addFixedBtn").addEventListener("click",()=>openFixed());
 document.getElementById("fixedCategory").addEventListener("change",toggleInstallmentFields);
+
+function updateInstallmentPreview(){
+  const total=Number(document.getElementById("installmentTotalAmount")?.value)||0;
+  const count=Number(document.getElementById("installmentCount")?.value)||0;
+  const el=document.getElementById("installmentPreview");
+  if(!el) return;
+  if(total>0 && count>=2){
+    const monthly=Math.floor((total/count)*100)/100;
+    const last=Math.round((total-monthly*(count-1))*100)/100;
+    el.textContent = last===monthly
+      ? `${fmt(monthly)} / mois pendant ${count} mois`
+      : `${fmt(monthly)} / mois, dernière mensualité ${fmt(last)}`;
+  }else{
+    el.textContent="La mensualité sera calculée automatiquement.";
+  }
+}
+document.getElementById("installmentTotalAmount").addEventListener("input",updateInstallmentPreview);
+document.getElementById("installmentCount").addEventListener("input",updateInstallmentPreview);
+
 document.getElementById("fixedForm").addEventListener("submit",e=>{
   e.preventDefault();
   const id=document.getElementById("fixedId").value;
@@ -513,10 +637,10 @@ document.getElementById("fixedForm").addEventListener("submit",e=>{
     archived:false
   };
   if(category==="paiement-plusieurs-fois"){
+    item.installmentTotalAmount=Number(document.getElementById("installmentTotalAmount").value)||0;
     item.installmentCount=Number(document.getElementById("installmentCount").value)||null;
-    item.installmentCurrent=Number(document.getElementById("installmentCurrent").value)||1;
-    item.installmentNextDate=document.getElementById("installmentNextDate").value||null;
-    item.autoEnd=document.getElementById("installmentAutoEnd").checked;
+    item.installmentStartMonth=document.getElementById("installmentStartMonth").value||monthKey();
+    item.amount=0;
   }
   if(id){
     const previous=state.fixedCharges.find(x=>x.id===id);
@@ -592,6 +716,25 @@ document.getElementById("importInput").addEventListener("change",async e=>{
 document.getElementById("resetBtn").addEventListener("click",()=>{
   if(confirm("Tout effacer ? Cette action est irréversible.")){state=defaultState();saveState();closeDialog(document.getElementById("settingsDialog"));}
 });
+
+
+function migrateInstallmentsV13(){
+  let changed=false;
+  state.fixedCharges.forEach(x=>{
+    if(x.category==="paiement-plusieurs-fois" && !x.installmentTotalAmount){
+      const count=Number(x.installmentCount)||2;
+      const monthly=Number(x.amount)||0;
+      x.installmentTotalAmount=Math.round(monthly*count*100)/100;
+      x.installmentStartMonth=monthKey();
+      delete x.installmentCurrent;
+      delete x.installmentNextDate;
+      delete x.autoEnd;
+      changed=true;
+    }
+  });
+  if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+migrateInstallmentsV13();
 
 syncCurrentMonthSnapshot();
 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));

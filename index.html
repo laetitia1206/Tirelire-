@@ -45,6 +45,20 @@
           </div>
         </div>
 
+        <section class="month-recap-card" id="monthRecapCard">
+          <div>
+            <p class="eyebrow">BILAN DU MOIS</p>
+            <h2 id="monthRecapTitle">Ce mois-ci</h2>
+          </div>
+          <div class="recap-main" id="monthRecapMain">0,00 € économisés</div>
+          <div class="recap-breakdown">
+            <div><span>Épargne mise de côté</span><strong id="recapSavings">0,00 €</strong></div>
+            <div><span>Reste non dépensé</span><strong id="recapUnspent">0,00 €</strong></div>
+            <div><span>Comparaison mois précédent</span><strong id="recapComparison">—</strong></div>
+            <div><span>Total économisé depuis le début</span><strong id="recapLifetime">0,00 €</strong></div>
+          </div>
+        </section>
+
         <div class="stats-grid">
           <article class="stat-card">
             <span class="stat-icon">💰</span>
@@ -259,19 +273,16 @@
 
       <div id="installmentFields" class="installment-box hidden">
         <p class="eyebrow">PAIEMENT EN PLUSIEURS FOIS</p>
-        <label>Nombre total d’échéances
+        <label>Montant total de l’achat
+          <div class="money-input"><input id="installmentTotalAmount" type="number" min="0.01" step="0.01" placeholder="0,00" /><span>€</span></div>
+        </label>
+        <label>Nombre de mensualités
           <input id="installmentCount" class="input" type="number" min="2" max="60" />
         </label>
-        <label>Échéance actuelle
-          <input id="installmentCurrent" class="input" type="number" min="1" max="60" />
+        <label>Première mensualité
+          <input id="installmentStartMonth" class="input" type="month" />
         </label>
-        <label>Prochaine échéance
-          <input id="installmentNextDate" class="input" type="date" />
-        </label>
-        <label class="switch-row">
-          <input id="installmentAutoEnd" type="checkbox" checked />
-          <span>Masquer automatiquement après la dernière échéance</span>
-        </label>
+        <div class="installment-preview" id="installmentPreview">La mensualité sera calculée automatiquement.</div>
       </div>
 
       <button class="primary-btn full" type="submit">Enregistrer</button>
