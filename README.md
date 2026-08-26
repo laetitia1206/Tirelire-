@@ -1,22 +1,15 @@
-# Tirelire — V1.1
+# Tirelire — V1.2
 
-Application web personnelle de suivi de budget et d'épargne.
+## Nouveautés
+- Suppression complète du cochon dans le titre
+- Navigation mois par mois avec flèches
+- Sélecteur de mois
+- Conservation des dépenses et de l’épargne de chaque mois
+- Historique jusqu’à 24 mois affichés
+- Consultation d’un ancien mois depuis l’historique
+- Revenus et charges fixes mémorisés sous forme d’instantané mensuel
+- Les modifications futures des charges fixes ne changent pas les anciens mois
+- Solde final affiché pour les mois passés
+- Les charges fixes actives restent disponibles pour le mois courant
 
-## Nouveautés V1.1
-- Nouvel onglet **Charges fixes**
-- Charges fixes détaillées individuellement
-- Catégories : voiture, logement, médias, assurances, abonnements, téléphone/internet, paiements en plusieurs fois, autres
-- Création de catégories personnalisées
-- Commentaire libre sur chaque charge
-- Gestion des paiements en plusieurs fois
-- Nombre total d'échéances
-- Échéance actuelle
-- Prochaine échéance
-- Option de fin automatique après la dernière échéance
-- Total des charges fixes calculé automatiquement
-- Nom de l'application changé en **Tirelire**
-
-## Données
-Les données restent stockées localement dans le navigateur de l'appareil.
-Aucun compte bancaire n'est connecté.
-Utilise régulièrement l'export JSON dans les réglages pour conserver une sauvegarde.
+Les données restent stockées localement sur l’appareil. Pense à utiliser l’export JSON dans les réglages pour faire des sauvegardes.

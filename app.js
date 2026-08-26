@@ -39,6 +39,7 @@ function defaultState(){
     categories:DEFAULT_CATEGORIES,
     fixedCategories:DEFAULT_FIXED_CATEGORIES,
     fixedCharges:[],
+    monthlySnapshots:{},
     expenses:[],
     savings:[],
     goals:[]
@@ -53,13 +54,40 @@ function loadState(){
       ...saved,
       categories:saved.categories?.length?saved.categories:DEFAULT_CATEGORIES,
       fixedCategories:saved.fixedCategories?.length?saved.fixedCategories:DEFAULT_FIXED_CATEGORIES,
-      fixedCharges:saved.fixedCharges||[]
+      fixedCharges:saved.fixedCharges||[],
+      monthlySnapshots:saved.monthlySnapshots||{}
     };
   }catch(e){ return defaultState(); }
 }
 let state = loadState();
 
+let selectedMonth = monthKey();
+
+function parseMonthKey(key){
+  const [y,m]=key.split("-").map(Number);
+  return new Date(y,m-1,1,12,0,0);
+}
+function shiftMonth(key,delta){
+  const d=parseMonthKey(key);
+  d.setMonth(d.getMonth()+delta);
+  return monthKey(d);
+}
+function selectedMonthExpenses(){
+  return state.expenses.filter(x=>monthKey(x.date)===selectedMonth);
+}
+function selectedMonthSavings(){
+  return state.savings.filter(x=>monthKey(x.date)===selectedMonth);
+}
+function monthLabel(key){
+  const d=parseMonthKey(key);
+  const label=new Intl.DateTimeFormat("fr-FR",{month:"long",year:"numeric"}).format(d);
+  return label.charAt(0).toUpperCase()+label.slice(1);
+}
+function isCurrentSelectedMonth(){ return selectedMonth===monthKey(); }
+
+
 function saveState(){
+  syncCurrentMonthSnapshot();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   renderAll();
 }
@@ -117,19 +145,39 @@ function maybeArchiveFinishedInstallments(){
   if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-function currentMonthExpenses(){
-  const key = monthKey();
-  return state.expenses.filter(x => monthKey(x.date) === key);
+function currentMonthExpenses(){ return selectedMonthExpenses(); }
+function currentMonthSavings(){ return selectedMonthSavings(); }
+
+function ensureMonthSnapshot(key){
+  if(!state.monthlySnapshots) state.monthlySnapshots={};
+  if(!state.monthlySnapshots[key]){
+    state.monthlySnapshots[key]={
+      income:Number(state.settings.income)||0,
+      fixed:fixedTotal()
+    };
+  }
+  return state.monthlySnapshots[key];
 }
-function currentMonthSavings(){
-  const key = monthKey();
-  return state.savings.filter(x => monthKey(x.date) === key);
+function syncCurrentMonthSnapshot(){
+  if(!state.monthlySnapshots) state.monthlySnapshots={};
+  state.monthlySnapshots[monthKey()]={
+    income:Number(state.settings.income)||0,
+    fixed:fixedTotal()
+  };
 }
+
 function totalsForMonth(key){
   const expenses = state.expenses.filter(x => monthKey(x.date)===key).reduce((s,x)=>s+Number(x.amount),0);
   const savings = state.savings.filter(x => monthKey(x.date)===key).reduce((s,x)=>s+Number(x.amount),0);
-  const income = key===monthKey() ? Number(state.settings.income)||0 : 0;
-  const fixed = key===monthKey() ? fixedTotal() : 0;
+  let income, fixed;
+  if(key===monthKey()){
+    income=Number(state.settings.income)||0;
+    fixed=fixedTotal();
+  }else{
+    const snap=state.monthlySnapshots?.[key] || {income:0,fixed:0};
+    income=Number(snap.income)||0;
+    fixed=Number(snap.fixed)||0;
+  }
   return {income,fixed,expenses,savings,remaining:income-fixed-expenses-savings};
 }
 
@@ -138,8 +186,9 @@ function categoryInfo(id){
 }
 
 function setMonthTitle(){
-  const label = new Intl.DateTimeFormat("fr-FR",{month:"long",year:"numeric"}).format(new Date());
-  document.getElementById("monthTitle").textContent = label.charAt(0).toUpperCase()+label.slice(1);
+  document.getElementById("monthTitle").textContent = monthLabel(selectedMonth);
+  document.getElementById("selectedMonthLabel").textContent = monthLabel(selectedMonth);
+  document.getElementById("monthPicker").value = selectedMonth;
 }
 
 function renderHome(){
@@ -147,8 +196,9 @@ function renderHome(){
   const savs = currentMonthSavings();
   const expenseTotal = exps.reduce((s,x)=>s+Number(x.amount),0);
   const savingTotal = savs.reduce((s,x)=>s+Number(x.amount),0);
-  const income = Number(state.settings.income)||0;
-  const fixed = fixedTotal();
+  const monthTotals = totalsForMonth(selectedMonth);
+  const income = monthTotals.income;
+  const fixed = monthTotals.fixed;
   const remaining = income-fixed-expenseTotal-savingTotal;
 
   document.getElementById("remainingValue").textContent = fmt(remaining);
@@ -159,10 +209,14 @@ function renderHome(){
   document.getElementById("spentSummary").textContent = `${fmt(fixed+expenseTotal+savingTotal)} utilisés`;
   document.getElementById("incomeSummary").textContent = `${fmt(income)} de revenus`;
 
-  const now = new Date();
-  const daysInMonth = new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  const daysLeft = Math.max(1,daysInMonth-now.getDate()+1);
-  document.getElementById("dailyBudget").textContent = `${fmt(Math.max(0,remaining)/daysLeft)} / jour`;
+  if(isCurrentSelectedMonth()){
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+    const daysLeft = Math.max(1,daysInMonth-now.getDate()+1);
+    document.getElementById("dailyBudget").textContent = `${fmt(Math.max(0,remaining)/daysLeft)} / jour`;
+  }else{
+    document.getElementById("dailyBudget").textContent = `Solde final : ${fmt(remaining)}`;
+  }
 
   const used = fixed+expenseTotal+savingTotal;
   const pct = income>0 ? Math.min(100,Math.max(0,(used/income)*100)) : 0;
@@ -284,7 +338,7 @@ function filterFixedList(){
 
 function renderAnalysis(){
   const exps=currentMonthExpenses();
-  const t=totalsForMonth(monthKey());
+  const t=totalsForMonth(selectedMonth);
   document.getElementById("analysisIncome").textContent=fmt(t.income);
   document.getElementById("analysisFixed").textContent=fmt(t.fixed);
   document.getElementById("analysisExpenses").textContent=fmt(t.expenses);
@@ -308,7 +362,12 @@ function renderAnalysis(){
     }).join("");
   }
 
-  const keys=[...new Set([...state.expenses.map(x=>monthKey(x.date)),...state.savings.map(x=>monthKey(x.date))])].sort().reverse().slice(0,12);
+  const keys=[...new Set([
+    monthKey(),
+    ...Object.keys(state.monthlySnapshots||{}),
+    ...state.expenses.map(x=>monthKey(x.date)),
+    ...state.savings.map(x=>monthKey(x.date))
+  ])].sort().reverse().slice(0,24);
   const hist=document.getElementById("historyList");
   if(!keys.length){hist.className="history-list empty-state";hist.textContent="L’historique apparaîtra après tes premiers mois d’utilisation.";}
   else{
@@ -316,10 +375,17 @@ function renderAnalysis(){
     hist.innerHTML=keys.map(k=>{
       const d=new Date(k+"-01T12:00:00");
       const label=new Intl.DateTimeFormat("fr-FR",{month:"long",year:"numeric"}).format(d);
-      const exp=state.expenses.filter(x=>monthKey(x.date)===k).reduce((s,x)=>s+Number(x.amount),0);
-      const sav=state.savings.filter(x=>monthKey(x.date)===k).reduce((s,x)=>s+Number(x.amount),0);
-      return `<div class="history-row"><div><strong>${label.charAt(0).toUpperCase()+label.slice(1)}</strong><small>${fmt(sav)} épargnés</small></div><strong>${fmt(exp)}</strong></div>`;
+      const mt=totalsForMonth(k);
+      return `<div class="history-row clickable ${k===selectedMonth?"active-month":""}" data-history-month="${k}">
+        <div><strong>${label.charAt(0).toUpperCase()+label.slice(1)}</strong><small>${fmt(mt.expenses)} dépensés • ${fmt(mt.savings)} épargnés</small></div>
+        <strong class="${mt.remaining>=0?"positive":"negative"}">${fmt(mt.remaining)}</strong>
+      </div>`;
     }).join("");
+    hist.querySelectorAll("[data-history-month]").forEach(row=>row.addEventListener("click",()=>{
+      selectedMonth=row.dataset.historyMonth;
+      renderAll();
+      navigate("home");
+    }));
   }
 }
 
@@ -374,7 +440,7 @@ const expenseDialog=document.getElementById("expenseDialog");
 function openExpense(id=null){
   document.getElementById("expenseForm").reset();
   document.getElementById("expenseId").value="";
-  document.getElementById("expenseDate").value=todayISO();
+  document.getElementById("expenseDate").value=isCurrentSelectedMonth()?todayISO():`${selectedMonth}-01`;
   document.getElementById("expenseDialogTitle").textContent="Ajouter une dépense";
   document.getElementById("deleteExpenseBtn").classList.add("hidden");
   if(id){
@@ -489,7 +555,7 @@ document.getElementById("settingsForm").addEventListener("submit",e=>{
 });
 
 document.getElementById("addSavingBtn").addEventListener("click",()=>{
-  document.getElementById("savingForm").reset();document.getElementById("savingDate").value=todayISO();renderSavings();openDialog(document.getElementById("savingDialog"));
+  document.getElementById("savingForm").reset();document.getElementById("savingDate").value=isCurrentSelectedMonth()?todayISO():`${selectedMonth}-01`;renderSavings();openDialog(document.getElementById("savingDialog"));
 });
 document.getElementById("savingForm").addEventListener("submit",e=>{
   e.preventDefault();
@@ -525,6 +591,24 @@ document.getElementById("importInput").addEventListener("change",async e=>{
 });
 document.getElementById("resetBtn").addEventListener("click",()=>{
   if(confirm("Tout effacer ? Cette action est irréversible.")){state=defaultState();saveState();closeDialog(document.getElementById("settingsDialog"));}
+});
+
+syncCurrentMonthSnapshot();
+localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+document.getElementById("prevMonthBtn").addEventListener("click",()=>{
+  selectedMonth=shiftMonth(selectedMonth,-1); renderAll();
+});
+document.getElementById("nextMonthBtn").addEventListener("click",()=>{
+  const next=shiftMonth(selectedMonth,1);
+  if(next<=monthKey()){ selectedMonth=next; renderAll(); }
+});
+document.getElementById("monthPickerBtn").addEventListener("click",()=>{
+  const picker=document.getElementById("monthPicker");
+  if(picker.showPicker) picker.showPicker(); else picker.click();
+});
+document.getElementById("monthPicker").addEventListener("change",e=>{
+  if(e.target.value && e.target.value<=monthKey()){ selectedMonth=e.target.value; renderAll(); }
 });
 
 if("serviceWorker" in navigator){

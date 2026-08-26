@@ -132,3 +132,15 @@ dialog.fallback-open .modal-card{
   width:min(520px,100%);
   margin:6vh auto;
 }
+
+.month-switcher{display:grid;grid-template-columns:46px 1fr 46px;gap:10px;align-items:center;margin:0 0 14px}
+.month-arrow,.month-current{border:0;background:var(--card);box-shadow:var(--shadow)}
+.month-arrow{height:46px;border-radius:15px;font-size:1.8rem;color:var(--primary)}
+.month-current{min-height:46px;border-radius:16px;padding:8px 14px;color:var(--text);font-weight:800}
+.month-current span,.month-current small{display:block}
+.month-current small{color:var(--muted);font-size:.67rem;margin-top:2px;font-weight:700}
+.month-picker-hidden{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.history-hint{color:var(--muted);font-size:.7rem}
+.history-row.clickable{cursor:pointer}
+.history-row.active-month{background:var(--soft);margin:0 -8px;padding:12px 8px;border-radius:14px;border-bottom:0}
+.past-month-banner{background:#fff8e8;color:#80631e;padding:10px 13px;border-radius:14px;font-size:.8rem;font-weight:700;margin-bottom:12px}

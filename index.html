@@ -22,6 +22,16 @@
       <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙️</button>
     </header>
 
+    <section class="month-switcher" aria-label="Choisir le mois">
+      <button class="month-arrow" id="prevMonthBtn" aria-label="Mois précédent">‹</button>
+      <button class="month-current" id="monthPickerBtn">
+        <span id="selectedMonthLabel">Ce mois-ci</span>
+        <small>Historique</small>
+      </button>
+      <button class="month-arrow" id="nextMonthBtn" aria-label="Mois suivant">›</button>
+      <input id="monthPicker" type="month" class="month-picker-hidden" />
+    </section>
+
     <main>
       <section class="view active" id="homeView">
         <div class="hero-card">
@@ -161,7 +171,7 @@
         </section>
 
         <section class="section-card">
-          <h3>Historique mensuel</h3>
+          <div class="section-head"><h3>Historique mensuel</h3><span class="history-hint">Touchez un mois pour l’ouvrir</span></div>
           <div id="historyList" class="history-list empty-state">L’historique apparaîtra après tes premiers mois d’utilisation.</div>
         </section>
       </section>
