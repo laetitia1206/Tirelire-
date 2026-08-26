@@ -1,11 +1,17 @@
-# Koala V1.7.1 — Nouvelle icône
+# Koala V1.7.2 — Correctif icône iPhone
 
-Même version fonctionnelle que Koala V1.7.
-Seule l'icône d'écran d'accueil/PWA a été remplacée par le nouveau Koala validé.
+Aucune fonctionnalité budget n'a été modifiée.
 
-Après mise à jour GitHub sur iPhone :
-1. supprimer l'ancienne icône Koala de l'écran d'accueil ;
+Correctif iOS :
+- `apple-touch-icon.png` placé à la racine du site
+- variante `apple-touch-icon-180x180.png` à la racine
+- déclarations Apple classiques dans `index.html`
+- aucune query string sur les icônes
+- manifest PWA conservé
+- cache du service worker changé
+
+Après déploiement GitHub Pages :
+1. attendre la publication ;
 2. ouvrir Koala dans Safari ;
-3. Partager → Sur l'écran d'accueil → Ajouter.
-
-Cela force iOS à récupérer la nouvelle icône.
+3. supprimer l'ancienne icône de l'écran d'accueil si elle existe ;
+4. Safari > Partager > Sur l'écran d'accueil > Ajouter.
