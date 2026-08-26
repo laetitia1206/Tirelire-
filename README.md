@@ -1,15 +1,11 @@
-# Koala V1.7 — Budget prévisionnel
+# Koala V1.7.1 — Nouvelle icône
 
-Dernière mise à jour fonctionnelle avant tests complets.
+Même version fonctionnelle que Koala V1.7.
+Seule l'icône d'écran d'accueil/PWA a été remplacée par le nouveau Koala validé.
 
-## Nouveautés
-- 12 mois précédents + mois actuel + 12 mois suivants
-- possibilité de préparer septembre dès la fin août
-- jour de prélèvement pour chaque charge fixe
-- affichage des prochains prélèvements sur l'accueil
-- paiements en plusieurs fois avec jour de prélèvement
-- échéances automatiques mois par mois
-- les paiements fractionnés disparaissent après la dernière mensualité
-- dates adaptées automatiquement aux mois courts (ex. prélèvement le 31 → dernier jour du mois)
+Après mise à jour GitHub sur iPhone :
+1. supprimer l'ancienne icône Koala de l'écran d'accueil ;
+2. ouvrir Koala dans Safari ;
+3. Partager → Sur l'écran d'accueil → Ajouter.
 
-Toutes les fonctions précédentes restent incluses et le stockage local reste compatible.
+Cela force iOS à récupérer la nouvelle icône.
