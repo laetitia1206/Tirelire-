@@ -13,13 +13,13 @@
   <title>Koala</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="koala-v1-6-2.css?v=162" />
+  <link rel="stylesheet" href="koala-v1-6-3.css?v=163" />
 </head>
 <body>
   <div class="app-shell">
     <header class="mobile-topbar">
       <div class="mobile-brand">
-        <img src="icons/koala-avatar.png" alt="" />
+        <img src="icons/icon-192.png" alt="" />
         <div>
           <strong>Koala</strong>
           <small>Mon budget</small>
@@ -33,22 +33,21 @@
         <p>Bonjour 👋</p>
         <strong>Voici ton mois en un coup d’œil</strong>
       </div>
-      <img src="icons/koala-small.png" alt="" />
+      <img src="icons/icon-192.png" alt="" />
     </section>
 
     <section class="month-switcher" aria-label="Choisir le mois">
-      <button class="month-arrow" id="prevMonthBtn" aria-label="Mois précédent">‹</button>
-      <button class="month-current" id="monthPickerBtn">
-        <span id="selectedMonthLabel">Ce mois-ci</span>
-        <small id="monthHint">Choisir le mois</small>
-      </button>
-      <button class="month-arrow" id="nextMonthBtn" aria-label="Mois suivant">›</button>
-      <input id="monthPicker" type="month" class="month-picker-hidden" />
+      <button class="month-arrow" id="prevMonthBtn" type="button" aria-label="Mois précédent">‹</button>
+      <label class="month-select-wrap" for="monthSelect">
+        <span>Mois</span>
+        <select id="monthSelect" class="month-select" aria-label="Choisir le mois"></select>
+      </label>
+      <button class="month-arrow" id="nextMonthBtn" type="button" aria-label="Mois suivant">›</button>
     </section>
 
     <main>
       <section class="view active" id="homeView">
-        <div class="hero-card"><img src="icons/koala-hero.png" class="hero-koala" alt="" />
+        <div class="hero-card"><img src="icons/icon-512.png" class="hero-koala" alt="" />
           <p class="muted">Reste à vivre</p>
           <div class="hero-value" id="remainingValue">0,00 €</div>
           <div class="daily-pill" id="dailyBudget">0,00 € / jour</div>
@@ -257,7 +256,7 @@
         <input id="expenseDate" class="input" type="date" required />
       </label>
       <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
-      <button class="primary-btn full" type="submit">Enregistrer</button>
+      <button class="primary-btn full" id="saveExpenseBtn" type="button">Enregistrer</button>
       <button class="danger-btn hidden" id="deleteExpenseBtn" type="button">Supprimer cette dépense</button>
     </form>
   </dialog>
@@ -317,7 +316,7 @@
       </div>
 
       <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
-      <button class="primary-btn full" type="submit">Enregistrer</button>
+      <button class="primary-btn full" id="saveFixedBtn" type="button">Enregistrer</button>
       <button class="danger-btn hidden" id="deleteFixedBtn" type="button">Supprimer cette charge</button>
     </form>
   </dialog>
@@ -338,7 +337,7 @@
         <input id="newFixedCategoryEmoji" class="input" type="text" maxlength="4" placeholder="🐾" />
       </label>
       <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
-      <button class="primary-btn full" type="submit">Créer la catégorie</button>
+      <button class="primary-btn full" id="saveFixedCategoryBtn" type="button">Créer la catégorie</button>
     </form>
   </dialog>
 
@@ -359,7 +358,7 @@
         <input id="payDay" class="input" type="number" min="1" max="31" />
       </label>
       <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
-      <button class="primary-btn full" type="submit">Enregistrer</button>
+      <button class="primary-btn full" id="saveSettingsBtn" type="button">Enregistrer</button>
       <button class="secondary-btn full" id="exportBtn" type="button">Exporter mes données</button>
       <label class="import-label secondary-btn full">
         Importer mes données
@@ -388,7 +387,7 @@
         <input id="savingDate" class="input" type="date" required />
       </label>
       <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
-      <button class="primary-btn full" type="submit">Ajouter à mon épargne</button>
+      <button class="primary-btn full" id="saveSavingBtn" type="button">Ajouter à mon épargne</button>
     </form>
   </dialog>
 
@@ -411,10 +410,10 @@
         <input id="goalEmoji" class="input" type="text" maxlength="4" placeholder="✈️" />
       </label>
       <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
-      <button class="primary-btn full" type="submit">Créer l’objectif</button>
+      <button class="primary-btn full" id="saveGoalBtn" type="button">Créer l’objectif</button>
     </form>
   </dialog>
 
-  <script src="koala-v1-6-2.js?v=162"></script>
+  <script src="koala-v1-6-3.js?v=163"></script>
 </body>
 </html>

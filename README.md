@@ -1,11 +1,13 @@
-# Koala V1.6.2 — Correctif catégories
+# Koala V1.6.3 — iPhone stable
 
-Correctifs iPhone :
-- menus de catégories des dépenses
-- menus de catégories des charges fixes
-- création d'une catégorie personnalisée
-- rafraîchissement immédiat des listes après création
-- compatibilité Safari/iOS renforcée pour les sélecteurs
-- cache forcé V1.6.2
+Correctifs :
+- choix du mois remplacé par un vrai menu déroulant Safari/iPhone
+- 24 derniers mois disponibles
+- bouton Enregistrer des revenus indépendant du submit fragile des dialogs
+- boutons d'enregistrement explicites pour dépenses, fixes, catégories, épargne et objectifs
+- nombres avec virgule acceptés pour les revenus
+- mascottes utilisent les icônes Koala déjà présentes dans le dépôt
+- cache forcé V1.6.3
+- JavaScript vérifié par Node
 
-Les autres correctifs V1.6.1 restent inclus.
+Les données existantes restent dans le même stockage local.
