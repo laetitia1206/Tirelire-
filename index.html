@@ -13,7 +13,7 @@
   <title>Koala</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="koala-v1-6-4.css?v=164" />
+  <link rel="stylesheet" href="koala-v1-7.css?v=170" />
 </head>
 <body>
   <div class="app-shell">
@@ -144,6 +144,16 @@
             </div>
           </article>
         </div>
+
+        <section class="section-card upcoming-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">À VENIR</p>
+              <h2>Prochains prélèvements</h2>
+            </div>
+          </div>
+          <div id="upcomingDebits" class="transaction-list empty-state">Aucun prélèvement à venir pour ce mois.</div>
+        </section>
 
         <section class="section-card">
           <div class="section-head">
@@ -339,6 +349,9 @@
       <label>Montant mensuel
         <div class="money-input"><input id="fixedAmount" type="number" min="0" step="0.01" required placeholder="0,00" /><span>€</span></div>
       </label>
+      <label>Jour de prélèvement
+        <input id="fixedDebitDay" class="input" type="number" min="1" max="31" placeholder="Ex : 5" />
+      </label>
       <label>Commentaire
         <textarea id="fixedComment" class="input textarea" maxlength="200" placeholder="Ex : MAIF, échéance 2/4, voyage…"></textarea>
       </label>
@@ -351,10 +364,10 @@
         <label>Nombre de mensualités
           <input id="installmentCount" class="input" type="number" min="2" max="60" />
         </label>
-        <label>Première mensualité
+        <label>Premier mois de prélèvement
           <input id="installmentStartMonth" class="input" type="month" />
         </label>
-        <div class="installment-preview" id="installmentPreview">La mensualité sera calculée automatiquement.</div>
+        <div class="installment-preview" id="installmentPreview">La mensualité et les échéances seront calculées automatiquement.</div>
       </div>
 
       <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
@@ -456,6 +469,6 @@
     </form>
   </dialog>
 
-  <script src="koala-v1-6-4.js?v=164"></script>
+  <script src="koala-v1-7.js?v=170"></script>
 </body>
 </html>

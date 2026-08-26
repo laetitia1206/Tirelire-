@@ -1,14 +1,15 @@
-# Koala V1.6.4 — Koalas intégrés
+# Koala V1.7 — Budget prévisionnel
 
-Cette version intègre les illustrations Koala directement dans index.html sous forme de SVG.
-Elles ne dépendent donc plus de fichiers image externes ou du cache Safari.
+Dernière mise à jour fonctionnelle avant tests complets.
 
-Les correctifs précédents restent inclus :
-- mois
-- revenus
-- dépenses
-- fixes
-- catégories
-- épargne
-- objectifs
-- historique
+## Nouveautés
+- 12 mois précédents + mois actuel + 12 mois suivants
+- possibilité de préparer septembre dès la fin août
+- jour de prélèvement pour chaque charge fixe
+- affichage des prochains prélèvements sur l'accueil
+- paiements en plusieurs fois avec jour de prélèvement
+- échéances automatiques mois par mois
+- les paiements fractionnés disparaissent après la dernière mensualité
+- dates adaptées automatiquement aux mois courts (ex. prélèvement le 31 → dernier jour du mois)
+
+Toutes les fonctions précédentes restent incluses et le stockage local reste compatible.
