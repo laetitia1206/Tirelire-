@@ -1,24 +1,11 @@
-# Koala — V1.6 Mobile First
+# Koala V1.6.2 — Correctif catégories
 
-Version pensée d'abord pour iPhone.
+Correctifs iPhone :
+- menus de catégories des dépenses
+- menus de catégories des charges fixes
+- création d'une catégorie personnalisée
+- rafraîchissement immédiat des listes après création
+- compatibilité Safari/iOS renforcée pour les sélecteurs
+- cache forcé V1.6.2
 
-## Interface
-- Accueil vertical
-- Mascotte Koala
-- Carte Reste à vivre
-- Bilan mensuel
-- Navigation basse : Accueil / Dépenses / + / Épargne / Menu
-- Menu pour Charges fixes, Analyse et Réglages
-- Fenêtres plein écran sur mobile avec X et Annuler
-
-## Fonctions conservées
-- Dépenses
-- Charges fixes
-- Catégories personnalisées
-- Paiements en plusieurs fois
-- Épargne & objectifs
-- Historique mensuel
-- Bilan mensuel
-- Export / import
-
-La même clé de stockage local est conservée afin de ne pas perdre les données déjà saisies.
+Les autres correctifs V1.6.1 restent inclus.

@@ -13,7 +13,7 @@
   <title>Koala</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="koala-v1-6.css?v=160" />
+  <link rel="stylesheet" href="koala-v1-6-2.css?v=162" />
 </head>
 <body>
   <div class="app-shell">
@@ -40,7 +40,7 @@
       <button class="month-arrow" id="prevMonthBtn" aria-label="Mois précédent">‹</button>
       <button class="month-current" id="monthPickerBtn">
         <span id="selectedMonthLabel">Ce mois-ci</span>
-        <small>Historique</small>
+        <small id="monthHint">Choisir le mois</small>
       </button>
       <button class="month-arrow" id="nextMonthBtn" aria-label="Mois suivant">›</button>
       <input id="monthPicker" type="month" class="month-picker-hidden" />
@@ -229,8 +229,8 @@
       <button class="nav-item active" data-view="home"><span>⌂</span><small>Accueil</small></button>
       <button class="nav-item" data-view="expenses"><span>▣</span><small>Dépenses</small></button>
       <div class="nav-spacer" aria-hidden="true"></div>
+      <button class="nav-item" data-view="fixed"><span>⌂</span><small>Fixes</small></button>
       <button class="nav-item" data-view="savings"><span>♡</span><small>Épargne</small></button>
-      <button class="nav-item" id="menuBtn"><span>☰</span><small>Menu</small></button>
     </nav>
   </div>
 
@@ -415,6 +415,6 @@
     </form>
   </dialog>
 
-  <script src="koala-v1-6.js?v=160"></script>
+  <script src="koala-v1-6-2.js?v=162"></script>
 </body>
 </html>
