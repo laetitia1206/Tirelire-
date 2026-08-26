@@ -1,4 +1,4 @@
-const CACHE="tirelire-v1-3";
+const CACHE="koala-v1-4";
 const ASSETS=["./","style.css","app.js","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png"];
 
 self.addEventListener("install", event => {

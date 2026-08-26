@@ -244,7 +244,7 @@ function categoryInfo(id){
 }
 
 function setMonthTitle(){
-  document.getElementById("monthTitle").textContent = monthLabel(selectedMonth);
+  document.getElementById("monthTitle").textContent = "Tableau de bord";
   document.getElementById("selectedMonthLabel").textContent = monthLabel(selectedMonth);
   document.getElementById("monthPicker").value = selectedMonth;
 }
@@ -702,7 +702,7 @@ document.getElementById("filterCategory").addEventListener("change",filterExpens
 document.getElementById("exportBtn").addEventListener("click",()=>{
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob); const a=document.createElement("a");
-  a.href=url;a.download=`tirelire-${todayISO()}.json`;a.click();URL.revokeObjectURL(url);
+  a.href=url;a.download=`koala-budget-${todayISO()}.json`;a.click();URL.revokeObjectURL(url);
 });
 document.getElementById("importInput").addEventListener("change",async e=>{
   const file=e.target.files?.[0]; if(!file)return;
