@@ -4,8 +4,8 @@
   "description": "Koala — budget, dépenses et objectifs d’épargne",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f8f5ef",
-  "theme_color": "#2f6b50",
+  "background_color": "#fbf8f2",
+  "theme_color": "#155f43",
   "lang": "fr",
   "icons": [
     {

@@ -3,86 +3,132 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#f5f7fb" />
+  <meta name="theme-color" content="#2f6b50" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Koala" />
   <title>Koala</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="koala-v1-5.css?v=150" />
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div>
-        <div class="brand-lockup"><span class="brand-mark">K</span><span>Koala</span></div>
-        <h1 id="monthTitle">Tableau de bord</h1>
+  <div class="desktop-app">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="icons/koala-logo.png" alt="" class="brand-koala">
+        <div>
+          <div class="brand-name">Koala</div>
+          <p>Gère ton argent, atteins tes objectifs,<br>construis ton avenir.</p>
+        </div>
       </div>
-      <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙️</button>
-    </header>
 
-    <section class="month-switcher" aria-label="Choisir le mois">
-      <button class="month-arrow" id="prevMonthBtn" aria-label="Mois précédent">‹</button>
-      <button class="month-current" id="monthPickerBtn">
-        <span id="selectedMonthLabel">Ce mois-ci</span>
-        <small>Historique</small>
-      </button>
-      <button class="month-arrow" id="nextMonthBtn" aria-label="Mois suivant">›</button>
-      <input id="monthPicker" type="month" class="month-picker-hidden" />
-    </section>
+      <nav class="side-nav">
+        <button class="side-nav-item active" data-view="home"><span>⌂</span>Accueil</button>
+        <button class="side-nav-item" data-view="expenses"><span>▣</span>Dépenses</button>
+        <button class="side-nav-item" data-view="fixed"><span>⌂</span>Charges fixes</button>
+        <button class="side-nav-item" data-view="savings"><span>♡</span>Épargne & objectifs</button>
+        <button class="side-nav-item" data-view="analysis"><span>▥</span>Analyse</button>
+      </nav>
 
-    <main>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-quote">
+        <img src="icons/koala-recap.png" alt="">
+        <strong>Citation du jour</strong>
+        <p>Chaque petit pas aujourd’hui construit ton avenir de demain.</p>
+      </div>
+      <button class="side-settings" id="settingsBtnDesktop"><span>⚙</span>Paramètres</button>
+    </aside>
+
+    <div class="content-shell">
+      <header class="desktop-topbar">
+        <div>
+          <p class="desktop-greeting">Bonjour ! 👋</p>
+          <p class="desktop-subtitle">Voici ton résumé du mois.</p>
+        </div>
+        <div class="top-actions">
+          <section class="month-switcher" aria-label="Choisir le mois">
+            <button class="month-arrow" id="prevMonthBtn" aria-label="Mois précédent">‹</button>
+            <button class="month-current" id="monthPickerBtn">
+              <span id="selectedMonthLabel">Ce mois-ci</span>
+              <small>Historique</small>
+            </button>
+            <button class="month-arrow" id="nextMonthBtn" aria-label="Mois suivant">›</button>
+            <input id="monthPicker" type="month" class="month-picker-hidden">
+          </section>
+          <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙</button>
+        </div>
+      </header>
+
+      <div class="mobile-header">
+        <div class="mobile-brand"><img src="icons/koala-logo.png" alt=""><strong>Koala</strong></div>
+        <button class="icon-btn" id="settingsBtnMobile" aria-label="Réglages">⚙</button>
+      </div>
+
+      <main>
+
       <section class="view active" id="homeView">
-        <div class="hero-card">
-          <p class="muted">Reste disponible</p>
+        <div class="home-web-grid">
+          <div class="home-left">
+            <div class="hero-card">
+              <div class="hero-copy">
+                <p class="muted">Reste à vivre</p>
           <div class="hero-value" id="remainingValue">0,00 €</div>
           <div class="daily-pill" id="dailyBudget">0,00 € / jour</div>
           <div class="progress-track"><div class="progress-fill" id="monthProgress"></div></div>
-          <div class="hero-foot">
-            <span id="spentSummary">0,00 € dépensés</span>
-            <span id="incomeSummary">0,00 € de revenus</span>
+              <div class="hero-foot">
+                <span id="spentSummary">0,00 € dépensés</span>
+                <span id="incomeSummary">0,00 € de revenus</span>
+              </div>
+            </div>
+            <img src="icons/koala-hero.png" class="hero-koala" alt="">
           </div>
-        </div>
 
-        <section class="month-recap-card" id="monthRecapCard">
+          <section class="month-recap-card" id="monthRecapCard">
           <div>
             <p class="eyebrow">BILAN DU MOIS</p>
             <h2 id="monthRecapTitle">Ce mois-ci</h2>
           </div>
-          <div class="recap-main" id="monthRecapMain">0,00 € économisés</div>
+          <div class="recap-visual">
+            <img src="icons/koala-recap.png" alt="">
+            <div class="recap-main" id="monthRecapMain">0,00 € économisés</div>
+          </div>
           <div class="recap-breakdown">
             <div><span>Épargne mise de côté</span><strong id="recapSavings">0,00 €</strong></div>
             <div><span>Reste non dépensé</span><strong id="recapUnspent">0,00 €</strong></div>
             <div><span>Comparaison mois précédent</span><strong id="recapComparison">—</strong></div>
             <div><span>Total économisé depuis le début</span><strong id="recapLifetime">0,00 €</strong></div>
           </div>
-        </section>
+          </section>
+        </div>
 
         <div class="stats-grid">
           <article class="stat-card">
-            <span class="stat-icon">💰</span>
+            <span class="stat-icon icon-green">▣</span>
             <div>
               <p>Revenus</p>
               <strong id="incomeValue">0,00 €</strong>
             </div>
           </article>
           <article class="stat-card">
-            <span class="stat-icon">🧾</span>
+            <span class="stat-icon icon-orange">⌂</span>
             <div>
               <p>Charges fixes</p>
               <strong id="fixedValue">0,00 €</strong>
             </div>
           </article>
           <article class="stat-card">
-            <span class="stat-icon">💳</span>
+            <span class="stat-icon icon-coral">▤</span>
             <div>
               <p>Dépenses</p>
               <strong id="expenseValue">0,00 €</strong>
             </div>
           </article>
           <article class="stat-card">
-            <span class="stat-icon">💚</span>
+            <span class="stat-icon icon-sage">♡</span>
             <div>
               <p>Épargne</p>
               <strong id="savingValue">0,00 €</strong>
@@ -90,10 +136,11 @@
           </article>
         </div>
 
+        <div class="analytics-grid">
         <section class="section-card">
           <div class="section-head">
             <div>
-              <p class="eyebrow">RÉPARTITION</p>
+              <p class="eyebrow">RÉPARTITION DES DÉPENSES</p>
               <h2>Ce mois-ci</h2>
             </div>
             <button class="text-btn" data-nav="analysis">Voir tout</button>
@@ -110,7 +157,8 @@
           </div>
           <div id="recentTransactions" class="transaction-list empty-state">Aucune opération pour le moment.</div>
         </section>
-      </section>
+              </div>
+</section>
 
       <section class="view" id="expensesView">
         <div class="section-head page-head">
@@ -207,7 +255,7 @@
 
         <div id="goalList" class="goal-list empty-state">Crée ton premier objectif d’épargne.</div>
       </section>
-    </main>
+    
 
     <button class="fab" id="fabAddExpense" aria-label="Ajouter une dépense">＋</button>
 
@@ -218,6 +266,9 @@
       <button class="nav-item" data-view="analysis"><span>◔</span><small>Analyse</small></button>
       <button class="nav-item" data-view="savings"><span>♡</span><small>Épargne</small></button>
     </nav>
+      </main>
+    </div>
+  </div>
   </div>
 
   <dialog id="expenseDialog" class="modal">
@@ -227,7 +278,7 @@
           <p class="eyebrow">NOUVELLE OPÉRATION</p>
           <h2 id="expenseDialogTitle">Ajouter une dépense</h2>
         </div>
-        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+        <button class="icon-btn dialog-close" type="button" data-dialog-close aria-label="Fermer">✕</button>
       </div>
       <input type="hidden" id="expenseId" />
       <label>Montant
@@ -242,6 +293,7 @@
       <label>Date
         <input id="expenseDate" class="input" type="date" required />
       </label>
+      <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
       <button class="primary-btn full" type="submit">Enregistrer</button>
       <button class="danger-btn hidden" id="deleteExpenseBtn" type="button">Supprimer cette dépense</button>
     </form>
@@ -255,7 +307,7 @@
           <p class="eyebrow">CHARGE FIXE</p>
           <h2 id="fixedDialogTitle">Ajouter une charge</h2>
         </div>
-        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+        <button class="icon-btn dialog-close" type="button" data-dialog-close aria-label="Fermer">✕</button>
       </div>
       <input type="hidden" id="fixedId" />
       <label>Nom
@@ -285,6 +337,7 @@
         <div class="installment-preview" id="installmentPreview">La mensualité sera calculée automatiquement.</div>
       </div>
 
+      <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
       <button class="primary-btn full" type="submit">Enregistrer</button>
       <button class="danger-btn hidden" id="deleteFixedBtn" type="button">Supprimer cette charge</button>
     </form>
@@ -297,7 +350,7 @@
           <p class="eyebrow">CATÉGORIE</p>
           <h2>Nouvelle catégorie fixe</h2>
         </div>
-        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+        <button class="icon-btn dialog-close" type="button" data-dialog-close aria-label="Fermer">✕</button>
       </div>
       <label>Nom
         <input id="newFixedCategoryName" class="input" type="text" required maxlength="40" placeholder="Ex : Animaux" />
@@ -305,6 +358,7 @@
       <label>Emoji
         <input id="newFixedCategoryEmoji" class="input" type="text" maxlength="4" placeholder="🐾" />
       </label>
+      <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
       <button class="primary-btn full" type="submit">Créer la catégorie</button>
     </form>
   </dialog>
@@ -316,7 +370,7 @@
           <p class="eyebrow">RÉGLAGES</p>
           <h2>Mon mois</h2>
         </div>
-        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+        <button class="icon-btn dialog-close" type="button" data-dialog-close aria-label="Fermer">✕</button>
       </div>
       <label>Revenus mensuels
         <div class="money-input"><input id="monthlyIncome" type="number" min="0" step="0.01" /><span>€</span></div>
@@ -325,6 +379,7 @@
       <label>Jour habituel de paie
         <input id="payDay" class="input" type="number" min="1" max="31" />
       </label>
+      <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
       <button class="primary-btn full" type="submit">Enregistrer</button>
       <button class="secondary-btn full" id="exportBtn" type="button">Exporter mes données</button>
       <label class="import-label secondary-btn full">
@@ -342,7 +397,7 @@
           <p class="eyebrow">ÉPARGNE</p>
           <h2>Ajouter une somme</h2>
         </div>
-        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+        <button class="icon-btn dialog-close" type="button" data-dialog-close aria-label="Fermer">✕</button>
       </div>
       <label>Montant
         <div class="money-input"><input id="savingAmount" type="number" min="0" step="0.01" required /><span>€</span></div>
@@ -353,6 +408,7 @@
       <label>Date
         <input id="savingDate" class="input" type="date" required />
       </label>
+      <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
       <button class="primary-btn full" type="submit">Ajouter à mon épargne</button>
     </form>
   </dialog>
@@ -364,7 +420,7 @@
           <p class="eyebrow">OBJECTIF</p>
           <h2>Nouvelle cagnotte</h2>
         </div>
-        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+        <button class="icon-btn dialog-close" type="button" data-dialog-close aria-label="Fermer">✕</button>
       </div>
       <label>Nom
         <input id="goalName" class="input" type="text" required maxlength="50" placeholder="Ex : Voyage, épargne de sécurité…" />
@@ -375,10 +431,11 @@
       <label>Emoji
         <input id="goalEmoji" class="input" type="text" maxlength="4" placeholder="✈️" />
       </label>
+      <button class="secondary-btn full dialog-close" type="button" data-dialog-close>Annuler</button>
       <button class="primary-btn full" type="submit">Créer l’objectif</button>
     </form>
   </dialog>
 
-  <script src="app.js"></script>
+  <script src="koala-v1-5.js?v=150"></script>
 </body>
 </html>

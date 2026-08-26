@@ -1,11 +1,2 @@
-# Koala — V1.4
-
-Refonte visuelle de Tirelire, désormais **Koala**.
-
-- Nouvelle identité vert sauge / crème
-- Tableau de bord plus doux et lisible
-- Cartes de revenus, charges, dépenses et épargne différenciées
-- Nouveau style pour les objectifs, historiques et paiements fractionnés
-- Nouvelle icône Koala
-- Toutes les fonctions de la V1.3 sont conservées
-- Les données locales existantes restent compatibles
+# Koala V1.5 Web
+Refonte responsive inspirée de la maquette validée : sidebar desktop, mascottes Koala, dashboard vert/crème, bilan illustré et navigation mobile. Toutes les fonctions et données locales existantes restent compatibles.
