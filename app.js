@@ -68,6 +68,35 @@ const euro = new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"});
 function fmt(v){ return euro.format(Number(v)||0); }
 function uid(){ return `${Date.now()}-${Math.random().toString(36).slice(2,8)}`; }
 
+function openDialog(dialog){
+  if(!dialog) return;
+  try{
+    if(typeof dialog.showModal==="function"){
+      dialog.showModal();
+    }else{
+      dialog.setAttribute("open","");
+      dialog.classList.add("fallback-open");
+      document.body.classList.add("modal-open");
+    }
+  }catch(e){
+    dialog.setAttribute("open","");
+    dialog.classList.add("fallback-open");
+    document.body.classList.add("modal-open");
+  }
+}
+function closeDialog(dialog){
+  if(!dialog) return;
+  try{
+    if(typeof dialog.close==="function") dialog.close();
+    else dialog.removeAttribute("open");
+  }catch(e){
+    dialog.removeAttribute("open");
+  }
+  dialog.classList.remove("fallback-open");
+  document.body.classList.remove("modal-open");
+}
+
+
 
 function fixedCategoryInfo(id){
   return state.fixedCategories.find(c=>c.id===id) || {name:"Autres",emoji:"📦"};
@@ -358,7 +387,7 @@ function openExpense(id=null){
     document.getElementById("expenseDialogTitle").textContent="Modifier la dépense";
     document.getElementById("deleteExpenseBtn").classList.remove("hidden");
   }
-  expenseDialog.showModal();
+  openDialog(expenseDialog);
 }
 ["fabAddExpense","addExpenseTop"].forEach(id=>document.getElementById(id).addEventListener("click",()=>openExpense()));
 
@@ -367,11 +396,11 @@ document.getElementById("expenseForm").addEventListener("submit",e=>{
   const id=document.getElementById("expenseId").value;
   const item={id:id||uid(),amount:Number(document.getElementById("expenseAmount").value),category:document.getElementById("expenseCategory").value,label:document.getElementById("expenseLabel").value.trim(),date:document.getElementById("expenseDate").value};
   if(id) state.expenses=state.expenses.map(x=>x.id===id?item:x); else state.expenses.push(item);
-  saveState(); expenseDialog.close();
+  saveState(); closeDialog(expenseDialog);
 });
 document.getElementById("deleteExpenseBtn").addEventListener("click",()=>{
   const id=document.getElementById("expenseId").value;
-  if(id && confirm("Supprimer cette dépense ?")){state.expenses=state.expenses.filter(x=>x.id!==id);saveState();expenseDialog.close();}
+  if(id && confirm("Supprimer cette dépense ?")){state.expenses=state.expenses.filter(x=>x.id!==id);saveState();closeDialog(expenseDialog);}
 });
 
 
@@ -401,7 +430,7 @@ function openFixed(id=null){
     document.getElementById("deleteFixedBtn").classList.remove("hidden");
   }
   toggleInstallmentFields();
-  fixedDialog.showModal();
+  openDialog(fixedDialog);
 }
 document.getElementById("addFixedBtn").addEventListener("click",()=>openFixed());
 document.getElementById("fixedCategory").addEventListener("change",toggleInstallmentFields);
@@ -428,18 +457,18 @@ document.getElementById("fixedForm").addEventListener("submit",e=>{
     if(previous?.archived) item.archived=previous.archived;
     state.fixedCharges=state.fixedCharges.map(x=>x.id===id?item:x);
   }else state.fixedCharges.push(item);
-  saveState();fixedDialog.close();
+  saveState();closeDialog(fixedDialog);
 });
 document.getElementById("deleteFixedBtn").addEventListener("click",()=>{
   const id=document.getElementById("fixedId").value;
-  if(id && confirm("Supprimer cette charge fixe ?")){state.fixedCharges=state.fixedCharges.filter(x=>x.id!==id);saveState();fixedDialog.close();}
+  if(id && confirm("Supprimer cette charge fixe ?")){state.fixedCharges=state.fixedCharges.filter(x=>x.id!==id);saveState();closeDialog(fixedDialog);}
 });
 document.getElementById("searchFixed").addEventListener("input",filterFixedList);
 document.getElementById("filterFixedCategory").addEventListener("change",filterFixedList);
 
 document.getElementById("addFixedCategoryBtn").addEventListener("click",()=>{
   document.getElementById("fixedCategoryForm").reset();
-  document.getElementById("fixedCategoryDialog").showModal();
+  openDialog(document.getElementById("fixedCategoryDialog"));
 });
 document.getElementById("fixedCategoryForm").addEventListener("submit",e=>{
   e.preventDefault();
@@ -448,33 +477,33 @@ document.getElementById("fixedCategoryForm").addEventListener("submit",e=>{
   const id=`custom-${Date.now()}`;
   state.fixedCategories.push({id,name,emoji});
   saveState();
-  document.getElementById("fixedCategoryDialog").close();
+  closeDialog(document.getElementById("fixedCategoryDialog"));
 });
 
-document.getElementById("settingsBtn").addEventListener("click",()=>{renderSettings();document.getElementById("settingsDialog").showModal();});
+document.getElementById("settingsBtn").addEventListener("click",()=>{renderSettings();openDialog(document.getElementById("settingsDialog"));});
 document.getElementById("settingsForm").addEventListener("submit",e=>{
   e.preventDefault();
   state.settings.income=Number(document.getElementById("monthlyIncome").value)||0;
   state.settings.payDay=Math.min(31,Math.max(1,Number(document.getElementById("payDay").value)||1));
-  saveState();document.getElementById("settingsDialog").close();
+  saveState();closeDialog(document.getElementById("settingsDialog"));
 });
 
 document.getElementById("addSavingBtn").addEventListener("click",()=>{
-  document.getElementById("savingForm").reset();document.getElementById("savingDate").value=todayISO();renderSavings();document.getElementById("savingDialog").showModal();
+  document.getElementById("savingForm").reset();document.getElementById("savingDate").value=todayISO();renderSavings();openDialog(document.getElementById("savingDialog"));
 });
 document.getElementById("savingForm").addEventListener("submit",e=>{
   e.preventDefault();
   state.savings.push({id:uid(),amount:Number(document.getElementById("savingAmount").value),goalId:document.getElementById("savingGoal").value||null,date:document.getElementById("savingDate").value});
-  saveState();document.getElementById("savingDialog").close();
+  saveState();closeDialog(document.getElementById("savingDialog"));
 });
 
 document.getElementById("addGoalBtn").addEventListener("click",()=>{
-  document.getElementById("goalForm").reset();document.getElementById("goalDialog").showModal();
+  document.getElementById("goalForm").reset();openDialog(document.getElementById("goalDialog"));
 });
 document.getElementById("goalForm").addEventListener("submit",e=>{
   e.preventDefault();
   state.goals.push({id:uid(),name:document.getElementById("goalName").value.trim(),target:Number(document.getElementById("goalTarget").value),emoji:document.getElementById("goalEmoji").value.trim()||"🎯"});
-  saveState();document.getElementById("goalDialog").close();
+  saveState();closeDialog(document.getElementById("goalDialog"));
 });
 
 document.getElementById("searchExpense").addEventListener("input",filterExpenseList);
@@ -495,10 +524,20 @@ document.getElementById("importInput").addEventListener("change",async e=>{
   e.target.value="";
 });
 document.getElementById("resetBtn").addEventListener("click",()=>{
-  if(confirm("Tout effacer ? Cette action est irréversible.")){state=defaultState();saveState();document.getElementById("settingsDialog").close();}
+  if(confirm("Tout effacer ? Cette action est irréversible.")){state=defaultState();saveState();closeDialog(document.getElementById("settingsDialog"));}
 });
 
 if("serviceWorker" in navigator){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }
 renderAll();
+
+document.querySelectorAll('dialog .icon-btn[value="cancel"]').forEach(btn=>{
+  btn.addEventListener("click",e=>{
+    const dlg=btn.closest("dialog");
+    if(dlg?.classList.contains("fallback-open")){
+      e.preventDefault();
+      closeDialog(dlg);
+    }
+  });
+});

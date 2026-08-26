@@ -111,3 +111,24 @@ label .input,label .money-input{margin-top:7px}
   .bottom-nav{padding-left:2px;padding-right:2px}
   .nav-item small{font-size:.61rem}
 }
+
+body.modal-open{overflow:hidden}
+dialog.fallback-open{
+  display:block;
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  max-width:none;
+  max-height:none;
+  margin:0;
+  padding:18px;
+  border:0;
+  background:rgba(20,27,43,.45);
+  z-index:100;
+  overflow:auto;
+}
+dialog.fallback-open .modal-card{
+  width:min(520px,100%);
+  margin:6vh auto;
+}
