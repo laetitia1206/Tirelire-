@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#f5f7fb" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Mon Budget" />
-  <title>Mon Budget</title>
+  <meta name="apple-mobile-web-app-title" content="Tirelire" />
+  <title>Tirelire</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
@@ -16,7 +16,7 @@
   <div class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow">MON BUDGET</p>
+        <p class="eyebrow">🐷 TIRELIRE</p>
         <h1 id="monthTitle">Ce mois-ci</h1>
       </div>
       <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙️</button>
@@ -107,6 +107,35 @@
         <div id="expenseList" class="transaction-list empty-state">Aucune dépense enregistrée.</div>
       </section>
 
+
+      <section class="view" id="fixedView">
+        <div class="section-head page-head">
+          <div>
+            <p class="eyebrow">CHARGES FIXES</p>
+            <h2>Mes prélèvements</h2>
+          </div>
+          <button class="primary-btn small" id="addFixedBtn">+ Ajouter</button>
+        </div>
+
+        <section class="section-card">
+          <div class="summary-lines">
+            <div><span>Total mensuel</span><strong id="fixedMonthlyTotal">0,00 €</strong></div>
+            <div><span>Abonnements + médias</span><strong id="fixedSubscriptionsTotal">0,00 €</strong></div>
+            <div><span>Paiements en plusieurs fois</span><strong id="installmentsTotal">0,00 €</strong></div>
+          </div>
+        </section>
+
+        <div class="filter-row">
+          <input id="searchFixed" class="input" type="search" placeholder="Rechercher…" />
+          <select id="filterFixedCategory" class="input">
+            <option value="">Toutes les catégories</option>
+          </select>
+        </div>
+
+        <div id="fixedList" class="transaction-list empty-state">Aucune charge fixe enregistrée.</div>
+        <button class="secondary-btn full fixed-category-add" id="addFixedCategoryBtn">+ Créer une catégorie</button>
+      </section>
+
       <section class="view" id="analysisView">
         <div class="section-head page-head">
           <div>
@@ -161,6 +190,7 @@
     <nav class="bottom-nav">
       <button class="nav-item active" data-view="home"><span>⌂</span><small>Accueil</small></button>
       <button class="nav-item" data-view="expenses"><span>◫</span><small>Dépenses</small></button>
+      <button class="nav-item" data-view="fixed"><span>▤</span><small>Fixes</small></button>
       <button class="nav-item" data-view="analysis"><span>◔</span><small>Analyse</small></button>
       <button class="nav-item" data-view="savings"><span>♡</span><small>Épargne</small></button>
     </nav>
@@ -193,6 +223,71 @@
     </form>
   </dialog>
 
+
+  <dialog id="fixedDialog" class="modal">
+    <form method="dialog" id="fixedForm" class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">CHARGE FIXE</p>
+          <h2 id="fixedDialogTitle">Ajouter une charge</h2>
+        </div>
+        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+      </div>
+      <input type="hidden" id="fixedId" />
+      <label>Nom
+        <input id="fixedLabel" class="input" type="text" required maxlength="80" placeholder="Ex : Assurance voiture, Netflix…" />
+      </label>
+      <label>Catégorie
+        <select id="fixedCategory" class="input" required></select>
+      </label>
+      <label>Montant mensuel
+        <div class="money-input"><input id="fixedAmount" type="number" min="0" step="0.01" required placeholder="0,00" /><span>€</span></div>
+      </label>
+      <label>Commentaire
+        <textarea id="fixedComment" class="input textarea" maxlength="200" placeholder="Ex : MAIF, échéance 2/4, voyage…"></textarea>
+      </label>
+
+      <div id="installmentFields" class="installment-box hidden">
+        <p class="eyebrow">PAIEMENT EN PLUSIEURS FOIS</p>
+        <label>Nombre total d’échéances
+          <input id="installmentCount" class="input" type="number" min="2" max="60" />
+        </label>
+        <label>Échéance actuelle
+          <input id="installmentCurrent" class="input" type="number" min="1" max="60" />
+        </label>
+        <label>Prochaine échéance
+          <input id="installmentNextDate" class="input" type="date" />
+        </label>
+        <label class="switch-row">
+          <input id="installmentAutoEnd" type="checkbox" checked />
+          <span>Masquer automatiquement après la dernière échéance</span>
+        </label>
+      </div>
+
+      <button class="primary-btn full" type="submit">Enregistrer</button>
+      <button class="danger-btn hidden" id="deleteFixedBtn" type="button">Supprimer cette charge</button>
+    </form>
+  </dialog>
+
+  <dialog id="fixedCategoryDialog" class="modal">
+    <form method="dialog" id="fixedCategoryForm" class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">CATÉGORIE</p>
+          <h2>Nouvelle catégorie fixe</h2>
+        </div>
+        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+      </div>
+      <label>Nom
+        <input id="newFixedCategoryName" class="input" type="text" required maxlength="40" placeholder="Ex : Animaux" />
+      </label>
+      <label>Emoji
+        <input id="newFixedCategoryEmoji" class="input" type="text" maxlength="4" placeholder="🐾" />
+      </label>
+      <button class="primary-btn full" type="submit">Créer la catégorie</button>
+    </form>
+  </dialog>
+
   <dialog id="settingsDialog" class="modal">
     <form method="dialog" id="settingsForm" class="modal-card">
       <div class="modal-head">
@@ -205,9 +300,7 @@
       <label>Revenus mensuels
         <div class="money-input"><input id="monthlyIncome" type="number" min="0" step="0.01" /><span>€</span></div>
       </label>
-      <label>Charges fixes mensuelles
-        <div class="money-input"><input id="monthlyFixed" type="number" min="0" step="0.01" /><span>€</span></div>
-      </label>
+      <div class="info-box">Les charges fixes sont maintenant calculées automatiquement depuis l’onglet <strong>Fixes</strong>.</div>
       <label>Jour habituel de paie
         <input id="payDay" class="input" type="number" min="1" max="31" />
       </label>

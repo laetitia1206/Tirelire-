@@ -79,7 +79,7 @@ label .input,label .money-input{margin-top:7px}
 .history-row{justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)}
 .history-row:last-child{border-bottom:0}
 .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(74px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;border:5px solid var(--bg);background:var(--primary);color:white;font-size:2rem;line-height:1;box-shadow:0 12px 28px rgba(111,111,232,.35);z-index:6}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:9px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:9px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
 .nav-item{border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:700}
 .nav-item span{font-size:1.25rem}
 .nav-item small{font-size:.68rem}
@@ -97,4 +97,17 @@ label .input,label .money-input{margin-top:7px}
 .negative{color:var(--danger)}
 @media (min-width:700px){
   .app-shell{padding-top:12px}
+}
+
+.textarea{min-height:90px;resize:vertical}
+.info-box{background:var(--soft);color:#515171;border-radius:16px;padding:13px 14px;font-size:.88rem;line-height:1.4}
+.installment-box{background:#fafafe;border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:13px}
+.switch-row{display:flex;align-items:center;gap:10px;font-weight:700}
+.switch-row input{width:19px;height:19px}
+.fixed-category-add{margin-top:14px}
+.comment-note{margin-top:5px;color:var(--muted);font-size:.78rem;white-space:normal!important}
+.installment-note{display:inline-block;margin-top:5px;background:var(--soft);color:var(--primary);font-size:.72rem;font-weight:800;padding:5px 8px;border-radius:999px}
+@media (max-width:390px){
+  .bottom-nav{padding-left:2px;padding-right:2px}
+  .nav-item small{font-size:.61rem}
 }

@@ -1,7 +1,7 @@
 {
-  "name": "Mon Budget",
-  "short_name": "Budget",
-  "description": "Application personnelle de suivi de budget",
+  "name": "Tirelire",
+  "short_name": "Tirelire",
+  "description": "Application personnelle de suivi de budget et d'épargne",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f4f6fb",

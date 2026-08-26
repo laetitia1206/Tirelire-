@@ -1,4 +1,15 @@
-const STORAGE_KEY = "monBudgetDataV1";
+const STORAGE_KEY = "tirelireDataV11";
+
+const DEFAULT_FIXED_CATEGORIES = [
+  {id:"voiture", name:"Voiture", emoji:"🚗"},
+  {id:"logement", name:"Logement", emoji:"🏠"},
+  {id:"medias", name:"Médias", emoji:"📺"},
+  {id:"assurances", name:"Assurances", emoji:"🛡️"},
+  {id:"abonnements", name:"Abonnements", emoji:"🔁"},
+  {id:"telephone", name:"Téléphone / Internet", emoji:"📱"},
+  {id:"paiement-plusieurs-fois", name:"Paiement en plusieurs fois", emoji:"💳"},
+  {id:"autres-fixes", name:"Autres", emoji:"📦"}
+];
 
 const DEFAULT_CATEGORIES = [
   {id:"courses", name:"Courses", emoji:"🛒"},
@@ -24,8 +35,10 @@ function monthKey(date = new Date()){
 }
 function defaultState(){
   return {
-    settings:{income:0,fixed:0,payDay:1},
+    settings:{income:0,payDay:1},
     categories:DEFAULT_CATEGORIES,
+    fixedCategories:DEFAULT_FIXED_CATEGORIES,
+    fixedCharges:[],
     expenses:[],
     savings:[],
     goals:[]
@@ -35,7 +48,13 @@ function loadState(){
   try{
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if(!saved) return defaultState();
-    return {...defaultState(),...saved,categories:saved.categories?.length?saved.categories:DEFAULT_CATEGORIES};
+    return {
+      ...defaultState(),
+      ...saved,
+      categories:saved.categories?.length?saved.categories:DEFAULT_CATEGORIES,
+      fixedCategories:saved.fixedCategories?.length?saved.fixedCategories:DEFAULT_FIXED_CATEGORIES,
+      fixedCharges:saved.fixedCharges||[]
+    };
   }catch(e){ return defaultState(); }
 }
 let state = loadState();
@@ -49,6 +68,26 @@ const euro = new Intl.NumberFormat("fr-FR",{style:"currency",currency:"EUR"});
 function fmt(v){ return euro.format(Number(v)||0); }
 function uid(){ return `${Date.now()}-${Math.random().toString(36).slice(2,8)}`; }
 
+
+function fixedCategoryInfo(id){
+  return state.fixedCategories.find(c=>c.id===id) || {name:"Autres",emoji:"📦"};
+}
+function activeFixedCharges(){
+  return state.fixedCharges.filter(x=>!x.archived);
+}
+function fixedTotal(){
+  return activeFixedCharges().reduce((s,x)=>s+Number(x.amount||0),0);
+}
+function maybeArchiveFinishedInstallments(){
+  let changed=false;
+  state.fixedCharges.forEach(x=>{
+    if(x.category==="paiement-plusieurs-fois" && x.autoEnd && Number(x.installmentCount)>0 && Number(x.installmentCurrent)>=Number(x.installmentCount) && !x.archived){
+      x.archived=true; changed=true;
+    }
+  });
+  if(changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
 function currentMonthExpenses(){
   const key = monthKey();
   return state.expenses.filter(x => monthKey(x.date) === key);
@@ -61,7 +100,7 @@ function totalsForMonth(key){
   const expenses = state.expenses.filter(x => monthKey(x.date)===key).reduce((s,x)=>s+Number(x.amount),0);
   const savings = state.savings.filter(x => monthKey(x.date)===key).reduce((s,x)=>s+Number(x.amount),0);
   const income = key===monthKey() ? Number(state.settings.income)||0 : 0;
-  const fixed = key===monthKey() ? Number(state.settings.fixed)||0 : 0;
+  const fixed = key===monthKey() ? fixedTotal() : 0;
   return {income,fixed,expenses,savings,remaining:income-fixed-expenses-savings};
 }
 
@@ -80,7 +119,7 @@ function renderHome(){
   const expenseTotal = exps.reduce((s,x)=>s+Number(x.amount),0);
   const savingTotal = savs.reduce((s,x)=>s+Number(x.amount),0);
   const income = Number(state.settings.income)||0;
-  const fixed = Number(state.settings.fixed)||0;
+  const fixed = fixedTotal();
   const remaining = income-fixed-expenseTotal-savingTotal;
 
   document.getElementById("remainingValue").textContent = fmt(remaining);
@@ -168,6 +207,52 @@ function filterExpenseList(){
   el.querySelectorAll("[data-expense-id]").forEach(row=>row.addEventListener("click",()=>openExpense(row.dataset.expenseId)));
 }
 
+
+function renderFixedCategorySelects(){
+  const options=state.fixedCategories.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join("");
+  document.getElementById("fixedCategory").innerHTML=options;
+  const filter=document.getElementById("filterFixedCategory");
+  const current=filter.value;
+  filter.innerHTML=`<option value="">Toutes les catégories</option>`+options;
+  filter.value=current;
+}
+
+function fixedChargeHTML(x){
+  const c=fixedCategoryInfo(x.category);
+  const installment=x.category==="paiement-plusieurs-fois" && x.installmentCount
+    ? `<span class="installment-note">Échéance ${Number(x.installmentCurrent)||1}/${Number(x.installmentCount)}</span>`
+    : "";
+  const comment=x.comment?`<small class="comment-note">${escapeHtml(x.comment)}</small>`:"";
+  return `<div class="transaction-row clickable" data-fixed-id="${x.id}">
+    <div class="emoji">${c.emoji}</div>
+    <div class="row-main"><strong>${escapeHtml(x.label)}</strong><small>${c.name}</small>${installment}${comment}</div>
+    <div class="row-value">- ${fmt(x.amount)}</div>
+  </div>`;
+}
+
+function renderFixed(){
+  renderFixedCategorySelects();
+  const total=fixedTotal();
+  const subs=activeFixedCharges().filter(x=>["medias","abonnements","telephone"].includes(x.category)).reduce((s,x)=>s+Number(x.amount),0);
+  const inst=activeFixedCharges().filter(x=>x.category==="paiement-plusieurs-fois").reduce((s,x)=>s+Number(x.amount),0);
+  document.getElementById("fixedMonthlyTotal").textContent=fmt(total);
+  document.getElementById("fixedSubscriptionsTotal").textContent=fmt(subs);
+  document.getElementById("installmentsTotal").textContent=fmt(inst);
+  filterFixedList();
+}
+function filterFixedList(){
+  const q=(document.getElementById("searchFixed").value||"").toLowerCase();
+  const cat=document.getElementById("filterFixedCategory").value;
+  const list=activeFixedCharges()
+    .filter(x=>(!cat||x.category===cat) && (!q||(x.label||"").toLowerCase().includes(q)||(x.comment||"").toLowerCase().includes(q)||fixedCategoryInfo(x.category).name.toLowerCase().includes(q)))
+    .sort((a,b)=>fixedCategoryInfo(a.category).name.localeCompare(fixedCategoryInfo(b.category).name)||a.label.localeCompare(b.label));
+  const el=document.getElementById("fixedList");
+  if(!list.length){el.className="transaction-list empty-state";el.textContent="Aucune charge fixe enregistrée.";return;}
+  el.className="transaction-list";
+  el.innerHTML=list.map(fixedChargeHTML).join("");
+  el.querySelectorAll("[data-fixed-id]").forEach(row=>row.addEventListener("click",()=>openFixed(row.dataset.fixedId)));
+}
+
 function renderAnalysis(){
   const exps=currentMonthExpenses();
   const t=totalsForMonth(monthKey());
@@ -240,11 +325,10 @@ function renderCategorySelects(){
 }
 function renderSettings(){
   document.getElementById("monthlyIncome").value=state.settings.income||"";
-  document.getElementById("monthlyFixed").value=state.settings.fixed||"";
   document.getElementById("payDay").value=state.settings.payDay||1;
 }
 function renderAll(){
-  setMonthTitle(); renderCategorySelects(); renderHome(); renderExpenses(); renderAnalysis(); renderSavings(); renderSettings();
+  maybeArchiveFinishedInstallments(); setMonthTitle(); renderCategorySelects(); renderHome(); renderExpenses(); renderFixed(); renderAnalysis(); renderSavings(); renderSettings();
 }
 
 function navigate(view){
@@ -290,11 +374,87 @@ document.getElementById("deleteExpenseBtn").addEventListener("click",()=>{
   if(id && confirm("Supprimer cette dépense ?")){state.expenses=state.expenses.filter(x=>x.id!==id);saveState();expenseDialog.close();}
 });
 
+
+const fixedDialog=document.getElementById("fixedDialog");
+function toggleInstallmentFields(){
+  const isInst=document.getElementById("fixedCategory").value==="paiement-plusieurs-fois";
+  document.getElementById("installmentFields").classList.toggle("hidden",!isInst);
+}
+function openFixed(id=null){
+  document.getElementById("fixedForm").reset();
+  document.getElementById("fixedId").value="";
+  document.getElementById("fixedDialogTitle").textContent="Ajouter une charge";
+  document.getElementById("deleteFixedBtn").classList.add("hidden");
+  renderFixedCategorySelects();
+  if(id){
+    const x=state.fixedCharges.find(e=>e.id===id); if(!x)return;
+    document.getElementById("fixedId").value=x.id;
+    document.getElementById("fixedLabel").value=x.label||"";
+    document.getElementById("fixedCategory").value=x.category;
+    document.getElementById("fixedAmount").value=x.amount;
+    document.getElementById("fixedComment").value=x.comment||"";
+    document.getElementById("installmentCount").value=x.installmentCount||"";
+    document.getElementById("installmentCurrent").value=x.installmentCurrent||"";
+    document.getElementById("installmentNextDate").value=x.installmentNextDate||"";
+    document.getElementById("installmentAutoEnd").checked=x.autoEnd!==false;
+    document.getElementById("fixedDialogTitle").textContent="Modifier la charge";
+    document.getElementById("deleteFixedBtn").classList.remove("hidden");
+  }
+  toggleInstallmentFields();
+  fixedDialog.showModal();
+}
+document.getElementById("addFixedBtn").addEventListener("click",()=>openFixed());
+document.getElementById("fixedCategory").addEventListener("change",toggleInstallmentFields);
+document.getElementById("fixedForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id=document.getElementById("fixedId").value;
+  const category=document.getElementById("fixedCategory").value;
+  const item={
+    id:id||uid(),
+    label:document.getElementById("fixedLabel").value.trim(),
+    category,
+    amount:Number(document.getElementById("fixedAmount").value),
+    comment:document.getElementById("fixedComment").value.trim(),
+    archived:false
+  };
+  if(category==="paiement-plusieurs-fois"){
+    item.installmentCount=Number(document.getElementById("installmentCount").value)||null;
+    item.installmentCurrent=Number(document.getElementById("installmentCurrent").value)||1;
+    item.installmentNextDate=document.getElementById("installmentNextDate").value||null;
+    item.autoEnd=document.getElementById("installmentAutoEnd").checked;
+  }
+  if(id){
+    const previous=state.fixedCharges.find(x=>x.id===id);
+    if(previous?.archived) item.archived=previous.archived;
+    state.fixedCharges=state.fixedCharges.map(x=>x.id===id?item:x);
+  }else state.fixedCharges.push(item);
+  saveState();fixedDialog.close();
+});
+document.getElementById("deleteFixedBtn").addEventListener("click",()=>{
+  const id=document.getElementById("fixedId").value;
+  if(id && confirm("Supprimer cette charge fixe ?")){state.fixedCharges=state.fixedCharges.filter(x=>x.id!==id);saveState();fixedDialog.close();}
+});
+document.getElementById("searchFixed").addEventListener("input",filterFixedList);
+document.getElementById("filterFixedCategory").addEventListener("change",filterFixedList);
+
+document.getElementById("addFixedCategoryBtn").addEventListener("click",()=>{
+  document.getElementById("fixedCategoryForm").reset();
+  document.getElementById("fixedCategoryDialog").showModal();
+});
+document.getElementById("fixedCategoryForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=document.getElementById("newFixedCategoryName").value.trim();
+  const emoji=document.getElementById("newFixedCategoryEmoji").value.trim()||"📌";
+  const id=`custom-${Date.now()}`;
+  state.fixedCategories.push({id,name,emoji});
+  saveState();
+  document.getElementById("fixedCategoryDialog").close();
+});
+
 document.getElementById("settingsBtn").addEventListener("click",()=>{renderSettings();document.getElementById("settingsDialog").showModal();});
 document.getElementById("settingsForm").addEventListener("submit",e=>{
   e.preventDefault();
   state.settings.income=Number(document.getElementById("monthlyIncome").value)||0;
-  state.settings.fixed=Number(document.getElementById("monthlyFixed").value)||0;
   state.settings.payDay=Math.min(31,Math.max(1,Number(document.getElementById("payDay").value)||1));
   saveState();document.getElementById("settingsDialog").close();
 });
@@ -323,7 +483,7 @@ document.getElementById("filterCategory").addEventListener("change",filterExpens
 document.getElementById("exportBtn").addEventListener("click",()=>{
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob); const a=document.createElement("a");
-  a.href=url;a.download=`mon-budget-${todayISO()}.json`;a.click();URL.revokeObjectURL(url);
+  a.href=url;a.download=`tirelire-${todayISO()}.json`;a.click();URL.revokeObjectURL(url);
 });
 document.getElementById("importInput").addEventListener("change",async e=>{
   const file=e.target.files?.[0]; if(!file)return;
