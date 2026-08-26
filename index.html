@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Mon Budget" />
+  <title>Mon Budget</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">MON BUDGET</p>
+        <h1 id="monthTitle">Ce mois-ci</h1>
+      </div>
+      <button class="icon-btn" id="settingsBtn" aria-label="Réglages">⚙️</button>
+    </header>
+
+    <main>
+      <section class="view active" id="homeView">
+        <div class="hero-card">
+          <p class="muted">Reste disponible</p>
+          <div class="hero-value" id="remainingValue">0,00 €</div>
+          <div class="daily-pill" id="dailyBudget">0,00 € / jour</div>
+          <div class="progress-track"><div class="progress-fill" id="monthProgress"></div></div>
+          <div class="hero-foot">
+            <span id="spentSummary">0,00 € dépensés</span>
+            <span id="incomeSummary">0,00 € de revenus</span>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span class="stat-icon">💰</span>
+            <div>
+              <p>Revenus</p>
+              <strong id="incomeValue">0,00 €</strong>
+            </div>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon">🧾</span>
+            <div>
+              <p>Charges fixes</p>
+              <strong id="fixedValue">0,00 €</strong>
+            </div>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon">💳</span>
+            <div>
+              <p>Dépenses</p>
+              <strong id="expenseValue">0,00 €</strong>
+            </div>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon">💚</span>
+            <div>
+              <p>Épargne</p>
+              <strong id="savingValue">0,00 €</strong>
+            </div>
+          </article>
+        </div>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">RÉPARTITION</p>
+              <h2>Ce mois-ci</h2>
+            </div>
+            <button class="text-btn" data-nav="analysis">Voir tout</button>
+          </div>
+          <div id="categoryPreview" class="category-list empty-state">Ajoute une première dépense pour voir la répartition.</div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">DERNIÈRES OPÉRATIONS</p>
+              <h2>Activité récente</h2>
+            </div>
+          </div>
+          <div id="recentTransactions" class="transaction-list empty-state">Aucune opération pour le moment.</div>
+        </section>
+      </section>
+
+      <section class="view" id="expensesView">
+        <div class="section-head page-head">
+          <div>
+            <p class="eyebrow">DÉPENSES</p>
+            <h2>Mes opérations</h2>
+          </div>
+          <button class="primary-btn small" id="addExpenseTop">+ Ajouter</button>
+        </div>
+
+        <div class="filter-row">
+          <input id="searchExpense" class="input" type="search" placeholder="Rechercher…" />
+          <select id="filterCategory" class="input">
+            <option value="">Toutes les catégories</option>
+          </select>
+        </div>
+
+        <div id="expenseList" class="transaction-list empty-state">Aucune dépense enregistrée.</div>
+      </section>
+
+      <section class="view" id="analysisView">
+        <div class="section-head page-head">
+          <div>
+            <p class="eyebrow">ANALYSE</p>
+            <h2>Où part mon argent ?</h2>
+          </div>
+        </div>
+
+        <section class="section-card">
+          <h3>Par catégorie</h3>
+          <div id="analysisCategories" class="analysis-list empty-state">Pas encore assez de données.</div>
+        </section>
+
+        <section class="section-card">
+          <h3>Résumé du mois</h3>
+          <div class="summary-lines">
+            <div><span>Revenus</span><strong id="analysisIncome">0,00 €</strong></div>
+            <div><span>Charges fixes</span><strong id="analysisFixed">0,00 €</strong></div>
+            <div><span>Dépenses variables</span><strong id="analysisExpenses">0,00 €</strong></div>
+            <div><span>Épargne</span><strong id="analysisSavings">0,00 €</strong></div>
+            <div class="summary-total"><span>Reste</span><strong id="analysisRemaining">0,00 €</strong></div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <h3>Historique mensuel</h3>
+          <div id="historyList" class="history-list empty-state">L’historique apparaîtra après tes premiers mois d’utilisation.</div>
+        </section>
+      </section>
+
+      <section class="view" id="savingsView">
+        <div class="section-head page-head">
+          <div>
+            <p class="eyebrow">ÉPARGNE</p>
+            <h2>Mes objectifs</h2>
+          </div>
+          <button class="primary-btn small" id="addGoalBtn">+ Objectif</button>
+        </div>
+
+        <section class="saving-total-card">
+          <p class="muted">Épargne mise de côté ce mois-ci</p>
+          <strong id="savingMonthTotal">0,00 €</strong>
+          <button class="secondary-btn" id="addSavingBtn">Ajouter une épargne</button>
+        </section>
+
+        <div id="goalList" class="goal-list empty-state">Crée ton premier objectif d’épargne.</div>
+      </section>
+    </main>
+
+    <button class="fab" id="fabAddExpense" aria-label="Ajouter une dépense">＋</button>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-view="home"><span>⌂</span><small>Accueil</small></button>
+      <button class="nav-item" data-view="expenses"><span>◫</span><small>Dépenses</small></button>
+      <button class="nav-item" data-view="analysis"><span>◔</span><small>Analyse</small></button>
+      <button class="nav-item" data-view="savings"><span>♡</span><small>Épargne</small></button>
+    </nav>
+  </div>
+
+  <dialog id="expenseDialog" class="modal">
+    <form method="dialog" id="expenseForm" class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">NOUVELLE OPÉRATION</p>
+          <h2 id="expenseDialogTitle">Ajouter une dépense</h2>
+        </div>
+        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+      </div>
+      <input type="hidden" id="expenseId" />
+      <label>Montant
+        <div class="money-input"><input id="expenseAmount" type="number" min="0" step="0.01" required placeholder="0,00" /><span>€</span></div>
+      </label>
+      <label>Catégorie
+        <select id="expenseCategory" class="input" required></select>
+      </label>
+      <label>Description
+        <input id="expenseLabel" class="input" type="text" maxlength="80" placeholder="Ex : restaurant, courses…" />
+      </label>
+      <label>Date
+        <input id="expenseDate" class="input" type="date" required />
+      </label>
+      <button class="primary-btn full" type="submit">Enregistrer</button>
+      <button class="danger-btn hidden" id="deleteExpenseBtn" type="button">Supprimer cette dépense</button>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="modal">
+    <form method="dialog" id="settingsForm" class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">RÉGLAGES</p>
+          <h2>Mon mois</h2>
+        </div>
+        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+      </div>
+      <label>Revenus mensuels
+        <div class="money-input"><input id="monthlyIncome" type="number" min="0" step="0.01" /><span>€</span></div>
+      </label>
+      <label>Charges fixes mensuelles
+        <div class="money-input"><input id="monthlyFixed" type="number" min="0" step="0.01" /><span>€</span></div>
+      </label>
+      <label>Jour habituel de paie
+        <input id="payDay" class="input" type="number" min="1" max="31" />
+      </label>
+      <button class="primary-btn full" type="submit">Enregistrer</button>
+      <button class="secondary-btn full" id="exportBtn" type="button">Exporter mes données</button>
+      <label class="import-label secondary-btn full">
+        Importer mes données
+        <input id="importInput" type="file" accept="application/json" hidden />
+      </label>
+      <button class="danger-btn" id="resetBtn" type="button">Réinitialiser l’application</button>
+    </form>
+  </dialog>
+
+  <dialog id="savingDialog" class="modal">
+    <form method="dialog" id="savingForm" class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">ÉPARGNE</p>
+          <h2>Ajouter une somme</h2>
+        </div>
+        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+      </div>
+      <label>Montant
+        <div class="money-input"><input id="savingAmount" type="number" min="0" step="0.01" required /><span>€</span></div>
+      </label>
+      <label>Objectif
+        <select id="savingGoal" class="input"></select>
+      </label>
+      <label>Date
+        <input id="savingDate" class="input" type="date" required />
+      </label>
+      <button class="primary-btn full" type="submit">Ajouter à mon épargne</button>
+    </form>
+  </dialog>
+
+  <dialog id="goalDialog" class="modal">
+    <form method="dialog" id="goalForm" class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">OBJECTIF</p>
+          <h2>Nouvelle cagnotte</h2>
+        </div>
+        <button class="icon-btn" value="cancel" aria-label="Fermer">✕</button>
+      </div>
+      <label>Nom
+        <input id="goalName" class="input" type="text" required maxlength="50" placeholder="Ex : Voyage, épargne de sécurité…" />
+      </label>
+      <label>Montant cible
+        <div class="money-input"><input id="goalTarget" type="number" min="1" step="0.01" required /><span>€</span></div>
+      </label>
+      <label>Emoji
+        <input id="goalEmoji" class="input" type="text" maxlength="4" placeholder="✈️" />
+      </label>
+      <button class="primary-btn full" type="submit">Créer l’objectif</button>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
